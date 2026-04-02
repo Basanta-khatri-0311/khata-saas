@@ -2,7 +2,7 @@ const express = require("express");
 
 const transactionRoute = express.Router(); // Create a new router instance for handling transaction-related routes
 
-const { createTransaction, getTransaction, getSummary } = require("../controllers/transactionController");
+const { createTransaction, getTransaction, getSummary, deleteTransaction } = require("../controllers/transactionController");
 
 
 
@@ -14,5 +14,6 @@ transactionRoute.get("/", getTransaction);
 
 transactionRoute.get("/summary", getSummary); // Define a GET route for retrieving the transaction summary, which calls the getSummary controller function
 
+transactionRoute.delete("/:id", deleteTransaction) 
 module.exports = transactionRoute; 
 // Export the transactionRoute to be used in other parts of the application

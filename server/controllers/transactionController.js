@@ -24,7 +24,6 @@ const createTransaction = async (req, res) => {
     }
 }
 
-
 const getTransaction = async (req, res) => {
     try {
         const transactions = await Transaction.find().sort({ createdAt: -1 });
@@ -36,7 +35,6 @@ const getTransaction = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
-
 
 const getSummary = async (req, res) => {
     try {
@@ -74,5 +72,21 @@ const getSummary = async (req, res) => {
     }
 }
 
-module.exports = { createTransaction, getTransaction, getSummary };
+const deleteTransaction = async (req, res) => {
+    try {
+        const { id } = req.params
+        const transaction = await Transaction.findByIdAndDelete(id); 
+
+        if (!transaction) {
+            return res.status(404).json({ message: "Transaction not Found" })
+        }
+
+        res.status(200).json({ message: "Transaction deleted Successfully" })
+
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+module.exports = { createTransaction, getTransaction, getSummary, deleteTransaction };
 // Export the createTransaction, getTransaction, and getSummary functions to be used in other parts of the application
