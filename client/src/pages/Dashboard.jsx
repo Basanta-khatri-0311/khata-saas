@@ -34,6 +34,17 @@ const Dashboard = () => {
             console.log(error)
         }
     }
+
+    const deleteTransaction = async (id) => {
+        try {
+            await api.delete(`/transactions/${id}`)
+            fetchTransactions() // Refresh the transaction list after deletion
+            fetchSummary() // Refresh the summary after deletion
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
         <div>
 
@@ -51,6 +62,9 @@ const Dashboard = () => {
                     {transactions.map((transaction) => (
                         <li key={transaction._id}>
                             {transaction.type} - {transaction.amount} - {transaction.note}
+                            <button onClick={() => deleteTransaction(transaction._id)}>
+                                Delete
+                            </button>
                         </li>
                     ))}
                 </ul>
