@@ -1,4 +1,5 @@
 const Transaction = require("../models/transaction.model");
+const TRANSACTION_TYPES = require("../constants/transactionTypes");
 
 
 const createTransaction = async (req, res) => {
@@ -11,7 +12,7 @@ const createTransaction = async (req, res) => {
             type,
             note,
         });
-        
+
         // Create a new transaction using the Transaction model
 
         res.status(201).json(transaction);
@@ -36,5 +37,42 @@ const getTransaction = async (req, res) => {
     }
 }
 
-module.exports = { createTransaction, getTransaction };
-// Export the createTransaction and getTransaction functions to be used in other parts of the application
+
+const getSummary = async (req, res) => {
+    try {
+        const summary = await Transaction.aggregate([
+            {
+                $group: {
+                    _id: "$type",
+                    total: { $sum: "$amount" }
+                }
+            }
+        ]);
+
+        let totalSales = 0;
+        let totalExpenses = 0;
+
+        summary.forEach((item) => {
+            if (item._id === TRANSACTION_TYPES.SALE) {
+                totalSales = item.total;
+            }
+
+            if (item._id === TRANSACTION_TYPES.EXPENSE) {
+                totalExpenses = item.total;
+            }
+        })
+
+        const profit = totalSales - totalExpenses;
+
+        res.status(200).json({
+            totalSales,
+            totalExpenses,
+            profit
+        })
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = { createTransaction, getTransaction, getSummary };
+// Export the createTransaction, getTransaction, and getSummary functions to be used in other parts of the application
