@@ -9,8 +9,11 @@ const Dashboard = () => {
         profit: 0
     })
 
+    const [transactions, setTransactions] = useState([])
+
     useEffect(() => {
         fetchSummary()
+        fetchTransactions()
     }, [])
 
     const fetchSummary = async () => {
@@ -21,13 +24,38 @@ const Dashboard = () => {
             console.log(error)
         }
     }
+
+    const fetchTransactions = async () => {
+        try {
+            const res = await api.get("/transactions")
+            setTransactions(res.data)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
         <div>
 
-            <div>Dashboard</div>
-            <p>Total Sales: {summary.totalSales}</p>
-            <p>Total Expenses: {summary.totalExpenses}</p>
-            <p>Profit: {summary.profit}</p>
+            <div>
+                <h2>Dashboard</h2>
+
+                <p>Total Sales: {summary.totalSales}</p>
+                <p>Total Expenses: {summary.totalExpenses}</p>
+                <p>Profit: {summary.profit}</p>
+            </div>
+
+            <div>
+                <h2>Transaction history</h2>
+                <ul>
+                    {transactions.map((transaction) => (
+                        <li key={transaction._id}>
+                            {transaction.type} - {transaction.amount} - {transaction.note}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
         </div>
     )
 }
