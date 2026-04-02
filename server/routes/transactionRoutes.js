@@ -1,0 +1,16 @@
+const express = require("express");
+
+const transactionRoute = express.Router(); // Create a new router instance for handling transaction-related routes
+
+const { createTransaction, getTransaction } = require("../controllers/transactionController");
+
+
+
+transactionRoute.post("/",  createTransaction); 
+// Define a POST route for creating a transaction, which calls the createTransaction controller function
+
+transactionRoute.get("/", getTransaction); 
+// Define a GET route for retrieving transactions, which calls the getTransaction controller function
+
+module.exports = transactionRoute; 
+// Export the transactionRoute to be used in other parts of the application
