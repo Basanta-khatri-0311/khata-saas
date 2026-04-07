@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight, Settings as SettingsIcon } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
+    const { settings } = useSettings();
+
     return (
         <>
             {/* Mobile backdrop */}
@@ -22,7 +25,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     ? 'translate-x-0 w-[280px] p-6' 
                     : '-translate-x-full md:translate-x-0 md:w-[84px] p-6 md:p-4 md:py-6'}
             `}>
-                {/* ... */}
+                {/* Desktop Toggle Button */}
                 <button 
                     onClick={() => setIsOpen(!isOpen)}
                     className="absolute -right-3 top-8 hidden md:flex items-center justify-center w-6 h-6 bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/10 rounded-full shadow-sm text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white transition-transform z-50"
@@ -37,8 +40,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         </div>
                         {isOpen && (
                             <div className="flex flex-col whitespace-nowrap overflow-hidden">
-                                <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight">Khata</span>
-                                <span className="text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-widest">खाता प्रणाली</span>
+                                <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
+                                    {settings?.businessName || 'Khata'}
+                                </span>
+                                <span className="text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-widest">
+                                    {settings?.businessSubtitle || 'खाता प्रणाली'}
+                                </span>
                             </div>
                         )}
                     </div>
@@ -56,6 +63,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
                         { label: 'Transactions', path: '/transactions', icon: ReceiptText },
                         { label: 'Reports', path: '/reports', icon: PieChart },
+                        { label: 'Settings', path: '/settings', icon: SettingsIcon },
                     ].map(({ label, path, icon: Icon }) => (
                         <NavLink
                             key={label}

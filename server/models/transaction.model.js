@@ -11,6 +11,10 @@ const transactionSchema = new mongoose.Schema({
         enum: Object.values(TRANSACTION_TYES),
         require: true
     },
+    category: {
+        type: String,
+        default: "General"
+    },
     note: {
         type: String,
         default: ""

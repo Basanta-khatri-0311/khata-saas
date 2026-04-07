@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Plus } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
 
-const TransactionForm = ({ addTransaction, submitting, amount, setAmount, note, setNote, type, setType }) => {
+const TransactionForm = ({ addTransaction, submitting, amount, setAmount, note, setNote, type, setType, category, setCategory }) => {
+    const { settings } = useSettings();
+    const categories = type === 'sale' ? (settings?.incomeCategories || []) : (settings?.expenseCategories || []);
+
+    // Auto-select first category if empty when type changes
+    useEffect(() => {
+        if (!category && categories.length > 0) {
+            setCategory(categories[0]);
+        } else if (categories.length > 0 && !categories.includes(category)) {
+            setCategory(categories[0]);
+        }
+    }, [type, categories, category, setCategory]);
+
     return (
         <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-5 sm:p-6 transition-colors">
             <div className="mb-6">
@@ -49,6 +62,20 @@ const TransactionForm = ({ addTransaction, submitting, amount, setAmount, note, 
                             className="w-full h-12 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl pl-12 pr-4 text-base font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-gray-600 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all"
                         />
                     </div>
+                </div>
+
+                {/* Category Dropdown */}
+                <div className="flex flex-col gap-1.5 mt-2">
+                    <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-wider">Category</label>
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full h-12 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 text-sm font-medium text-slate-900 dark:text-white outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all appearance-none"
+                    >
+                        {categories.map((cat, idx) => (
+                            <option key={idx} value={cat} className="text-slate-800 dark:text-gray-800">{cat}</option>
+                        ))}
+                    </select>
                 </div>
 
                 {/* Description Input */}

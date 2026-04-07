@@ -98,7 +98,7 @@ const TransactionTable = ({ transactions, searchQuery, loading, deleteTransactio
                                                     {tx.note || (isSale ? 'General Receipt' : 'General Payment')}
                                                 </span>
                                                 <span className={`text-[11px] sm:text-xs font-semibold mt-0.5 ${isSale ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                                                    {isSale ? 'Income' : 'Expense'}
+                                                    {tx.category || (isSale ? 'Income' : 'Expense')}
                                                 </span>
                                             </div>
                                         </div>

@@ -1,22 +1,27 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { SettingsProvider } from './context/SettingsContext';
 import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="transactions" element={<Transactions />} />
-          <Route path="reports" element={<Reports />} />
-        </Route>
-      </Routes>
-    </Router>
+    <SettingsProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </Router>
+    </SettingsProvider>
   );
 };
 

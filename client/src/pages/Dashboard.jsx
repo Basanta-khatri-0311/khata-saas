@@ -15,6 +15,7 @@ const Dashboard = () => {
     // Form State
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('sale');
+    const [category, setCategory] = useState('');
     const [note, setNote] = useState('');
     
     // App State
@@ -43,9 +44,10 @@ const Dashboard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await api.post('/transactions', { amount, type, note });
+            await api.post('/transactions', { amount, type, category, note });
             setAmount('');
             setNote('');
+            setCategory('');
             await Promise.all([fetchSummary(), fetchTransactions()]);
         } catch (err) { console.error(err); }
         finally { setSubmitting(false); }
@@ -98,6 +100,8 @@ const Dashboard = () => {
                         submitting={submitting}
                         amount={amount}
                         setAmount={setAmount}
+                        category={category}
+                        setCategory={setCategory}
                         note={note}
                         setNote={setNote}
                         type={type}
