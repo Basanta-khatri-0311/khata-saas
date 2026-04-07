@@ -74,6 +74,33 @@ const Dashboard = () => {
         } catch (err) { console.error(err); }
     };
 
+    // Calculate Day Book (Today only)
+    const isToday = (dateString) => {
+        const date = new Date(dateString);
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+    };
+
+    const todayTransactions = transactions.filter(tx => tx.createdAt && isToday(tx.createdAt));
+
+    const todaySales = todayTransactions
+        .filter(tx => tx.type === 'sale')
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+    const todayExpenses = todayTransactions
+        .filter(tx => tx.type === 'expense')
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+    const todayBalance = todaySales - todayExpenses;
+
+    const dayBookSummary = {
+        totalSales: todaySales,
+        totalExpenses: todayExpenses,
+        profit: todayBalance
+    };
+
     return (
         <div className="flex h-screen bg-[#F8FAFC] dark:bg-black text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-500/30 overflow-hidden">
             
@@ -92,7 +119,7 @@ const Dashboard = () => {
                 {/* Dashboard Body */}
                 <div className="flex-1 overflow-y-auto w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6 sm:gap-8 pb-24 custom-scrollbar">
 
-                    <StatsCards summary={summary} />
+                    <StatsCards summary={dayBookSummary} />
 
                     {/* Content Grid */}
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
@@ -112,7 +139,7 @@ const Dashboard = () => {
 
                         <div className="xl:col-span-2 flex flex-col h-full min-h-[400px]">
                             <TransactionTable 
-                                transactions={transactions}
+                                transactions={todayTransactions}
                                 searchQuery={searchQuery}
                                 loading={loading}
                                 deleteTransaction={deleteTransaction}

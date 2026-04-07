@@ -6,8 +6,6 @@ const formatNPR = (val) =>
 
 const StatsCards = ({ summary }) => {
     // For now, defaulting totalSales and totalExpenses to 0 as requested, we'll implement later
-    const displaySales = 0; 
-    const displayExpenses = 0;
     const profitPositive = (summary.profit || 0) >= 0;
 
     return (
@@ -15,21 +13,21 @@ const StatsCards = ({ summary }) => {
             {[
                 { 
                     label: 'Total Receipts (आम्दानी)', 
-                    value: formatNPR(displaySales), 
+                    value: formatNPR(summary.totalSales), 
                     icon: TrendingUp, 
                     color: 'text-slate-900 dark:text-white', 
                     bgIcon: 'bg-emerald-100 dark:bg-emerald-500/10', 
                     textIcon: 'text-emerald-600 dark:text-emerald-400', 
-                    trend: 'Not set' 
+                    trend: 'Today' 
                 },
                 { 
                     label: 'Total Payments (खर्च)', 
-                    value: formatNPR(displayExpenses), 
+                    value: formatNPR(summary.totalExpenses), 
                     icon: TrendingDown, 
                     color: 'text-slate-900 dark:text-white', 
                     bgIcon: 'bg-rose-100 dark:bg-rose-500/10', 
                     textIcon: 'text-rose-600 dark:text-rose-400', 
-                    trend: 'Not set' 
+                    trend: 'Today' 
                 },
                 { 
                     label: 'Net Balance (बाँकी)', 

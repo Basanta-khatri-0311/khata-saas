@@ -7,12 +7,12 @@ const { createTransaction, getTransaction, getSummary, deleteTransaction } = req
 
 
 transactionRoute.post("/",  createTransaction); 
-// Define a POST route for creating a transaction, which calls the createTransaction controller function
+// POST route for creating a transaction, which calls the createTransaction controller function
 
 transactionRoute.get("/", getTransaction); 
-// Define a GET route for retrieving transactions, which calls the getTransaction controller function
+// GET route for retrieving transactions, which calls the getTransaction controller function
 
-transactionRoute.get("/summary", getSummary); // Define a GET route for retrieving the transaction summary, which calls the getSummary controller function
+transactionRoute.get("/summary", getSummary); // GET route for retrieving the transaction summary, which calls the getSummary controller function
 
 transactionRoute.delete("/:id", deleteTransaction) 
 module.exports = transactionRoute; 

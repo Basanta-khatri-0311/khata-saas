@@ -4,14 +4,18 @@ const TRANSACTION_TYPES = require("../constants/transactionTypes");
 
 const createTransaction = async (req, res) => {
     try {
-        const { amount, type, note } = req.body;
+        const { amount, type, note, createdAt } = req.body;
         // Destructure the required fields from the request body
 
-        const transaction = await Transaction.create({
+        const transactionData = {
             amount,
             type,
             note,
-        });
+        };
+        // Insert custom date for testing/seeding if provided
+        if (createdAt) transactionData.createdAt = createdAt;
+
+        const transaction = await Transaction.create(transactionData);
 
         // Create a new transaction using the Transaction model
 
