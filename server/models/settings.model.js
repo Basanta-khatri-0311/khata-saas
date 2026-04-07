@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const settingsSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
     businessName: { type: String, default: "Khata" },
     businessSubtitle: { type: String, default: "खाता प्रणाली" },
     incomeCategories: { type: [String], default: ["General Income", "Sales", "Services"] },

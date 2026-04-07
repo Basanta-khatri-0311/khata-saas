@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
+import { useAuth } from './AuthContext';
 
 const SettingsContext = createContext();
 
 export const SettingsProvider = ({ children }) => {
+    const { user } = useAuth();
     const [settings, setSettings] = useState({
         businessName: 'Khata',
         businessSubtitle: 'खाता प्रणाली',
@@ -35,8 +37,19 @@ export const SettingsProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        fetchSettings();
-    }, []);
+        if (user) {
+            fetchSettings();
+        } else {
+            // Reset to defaults on logout
+            setSettings({
+                businessName: 'Khata',
+                businessSubtitle: 'खाता प्रणाली',
+                incomeCategories: ['General Income', 'Sales', 'Services'],
+                expenseCategories: ['General Expense', 'Rent', 'Khaja', 'Salary', 'Internet']
+            });
+            setLoading(false);
+        }
+    }, [user]);
 
     return (
         <SettingsContext.Provider value={{ settings, updateSettings, loading }}>

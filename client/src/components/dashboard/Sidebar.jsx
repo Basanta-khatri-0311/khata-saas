@@ -1,10 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight, Settings as SettingsIcon } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight, Settings as SettingsIcon, LogOut } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
     const { settings } = useSettings();
+    const { logout } = useAuth();
 
     return (
         <>
@@ -84,6 +86,18 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         </NavLink>
                     ))}
                 </nav>
+
+                {/* Logout Button */}
+                <div className="pt-6 mt-6 border-t border-slate-100 dark:border-white/5 font-sans">
+                    <button 
+                        onClick={logout}
+                        className={`flex items-center ${isOpen ? 'gap-3 px-3 w-full' : 'justify-center'} py-3 rounded-xl transition-all duration-200 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold group`}
+                        title={!isOpen ? 'Logout' : ''}
+                    >
+                        <LogOut className="w-5 h-5 shrink-0" strokeWidth={2.5} />
+                        {isOpen && <span className="text-[14px]">Log Out</span>}
+                    </button>
+                </div>
             </aside>
         </>
     );

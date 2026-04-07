@@ -1,13 +1,13 @@
 const Transaction = require("../models/transaction.model");
 const TRANSACTION_TYPES = require("../constants/transactionTypes");
 
-
 const createTransaction = async (req, res) => {
     try {
         const { amount, type, category, note, createdAt } = req.body;
         // Destructure the required fields from the request body
 
         const transactionData = {
+            user: req.user.id,
             amount,
             type,
             category: category || "General",
@@ -24,14 +24,14 @@ const createTransaction = async (req, res) => {
         // Send a response with the created transaction and a 201 status code
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(400).json({ error: error.message });
         // Handle any errors that occur during the transaction creation process and send a 500 status code with the error message
     }
 }
 
-const getTransaction = async (req, res) => {
+const getTransactions = async (req, res) => {
     try {
-        const transactions = await Transaction.find().sort({ createdAt: -1 });
+        const transactions = await Transaction.find({ user: req.user.id }).sort({ createdAt: -1 });
         // Retrieve all transactions from the database using the Transaction model and sort them in descending order based on the createdAt field
 
         res.status(200).json(transactions);
@@ -43,27 +43,18 @@ const getTransaction = async (req, res) => {
 
 const getSummary = async (req, res) => {
     try {
-        const summary = await Transaction.aggregate([
-            {
-                $group: {
-                    _id: "$type",
-                    total: { $sum: "$amount" }
-                }
-            }
-        ]);
+        const transactions = await Transaction.find({ user: req.user.id });
 
         let totalSales = 0;
         let totalExpenses = 0;
 
-        summary.forEach((item) => {
-            if (item._id === TRANSACTION_TYPES.SALE) {
-                totalSales = item.total;
+        transactions.forEach((tx) => {
+            if (tx.type === TRANSACTION_TYPES.SALE) {
+                totalSales += tx.amount;
+            } else if (tx.type === TRANSACTION_TYPES.EXPENSE) {
+                totalExpenses += tx.amount;
             }
-
-            if (item._id === TRANSACTION_TYPES.EXPENSE) {
-                totalExpenses = item.total;
-            }
-        })
+        });
 
         const profit = totalSales - totalExpenses;
 
@@ -80,18 +71,50 @@ const getSummary = async (req, res) => {
 const deleteTransaction = async (req, res) => {
     try {
         const { id } = req.params
-        const transaction = await Transaction.findByIdAndDelete(id); 
+        const transaction = await Transaction.findOneAndDelete({ _id: id, user: req.user.id }); 
 
         if (!transaction) {
-            return res.status(404).json({ message: "Transaction not Found" })
+            return res.status(404).json({ error: "Transaction not found" })
         }
 
-        res.status(200).json({ message: "Transaction deleted Successfully" })
+        res.status(200).json({ message: "Transaction deleted successfully" })
 
     } catch (error) {
         res.status(500).json({ error: error.message })
     }
 }
 
-module.exports = { createTransaction, getTransaction, getSummary, deleteTransaction };
+const getDayBookSummary = async (req, res) => {
+    try {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const transactions = await Transaction.find({
+            user: req.user.id,
+            createdAt: { $gte: startOfDay, $lte: endOfDay }
+        });
+
+        let totalSales = 0;
+        let totalExpenses = 0;
+
+        transactions.forEach((tx) => {
+            if (tx.type === TRANSACTION_TYPES.SALE) totalSales += tx.amount;
+            else if (tx.type === TRANSACTION_TYPES.EXPENSE) totalExpenses += tx.amount;
+        });
+
+        res.status(200).json({
+            totalSales,
+            totalExpenses,
+            profit: totalSales - totalExpenses,
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { createTransaction, getTransactions, getSummary, deleteTransaction, getDayBookSummary };
 // Export the createTransaction, getTransaction, and getSummary functions to be used in other parts of the application

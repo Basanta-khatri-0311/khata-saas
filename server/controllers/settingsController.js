@@ -2,9 +2,9 @@ const Settings = require("../models/settings.model");
 
 const getSettings = async (req, res) => {
     try {
-        let settings = await Settings.findOne();
+        let settings = await Settings.findOne({ user: req.user.id });
         if (!settings) {
-            settings = await Settings.create({});
+            settings = await Settings.create({ user: req.user.id });
         }
         res.status(200).json(settings);
     } catch (error) {
@@ -15,9 +15,9 @@ const getSettings = async (req, res) => {
 const updateSettings = async (req, res) => {
     try {
         const { businessName, businessSubtitle, incomeCategories, expenseCategories } = req.body;
-        let settings = await Settings.findOne();
+        let settings = await Settings.findOne({ user: req.user.id });
         if (!settings) {
-            settings = new Settings();
+            settings = new Settings({ user: req.user.id });
         }
         
         if (businessName !== undefined) settings.businessName = businessName;
