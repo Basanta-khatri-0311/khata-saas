@@ -16,9 +16,7 @@ export const AuthProvider = ({ children }) => {
 
     const resetLogoutTimer = useCallback(() => {
         if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
-        // Set timer for 1 hour (3600000ms)
         logoutTimerRef.current = setTimeout(() => {
-            console.log("Session expired due to inactivity");
             logout();
         }, 3600000); 
     }, [logout]);
@@ -39,33 +37,31 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
-    // Check for existing session on load
+    // Robust Initialization
     useEffect(() => {
-        const userInfo = localStorage.getItem('userInfo');
-        if (userInfo) {
-            setUser(JSON.parse(userInfo));
-            resetLogoutTimer();
-        }
-        setLoading(false);
-    }, [resetLogoutTimer]);
-
-    // Global Activity Listener for the 1-hour timeout
-    useEffect(() => {
-        const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-        const handleActivity = () => {
-            if (user) resetLogoutTimer();
+        const initAuth = () => {
+            try {
+                const stored = localStorage.getItem('userInfo');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    setUser(parsed);
+                    // Manually trigger timer instead of dependency
+                    if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
+                    logoutTimerRef.current = setTimeout(() => logout(), 3600000);
+                }
+            } catch (err) {
+                console.error("Storage Error:", err);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        events.forEach(event => window.addEventListener(event, handleActivity));
-        return () => {
-            events.forEach(event => window.removeEventListener(event, handleActivity));
-            if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
-        };
-    }, [user, resetLogoutTimer]);
+        initAuth();
+    }, [logout]);
 
     return (
         <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };

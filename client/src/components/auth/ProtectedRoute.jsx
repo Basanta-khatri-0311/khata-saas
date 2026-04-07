@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
     if (loading) return null;
 
     if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to="/" replace />;
     }
 
     // Redirect to pending page if not active

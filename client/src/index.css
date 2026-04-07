@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 body {
@@ -7,21 +13,96 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.font-mono {
-  font-family: 'Geist Mono', monospace;
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
 }
 
-input[type='number']::-webkit-inner-spin-button,
-input[type='number']::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-input[type='number'] {
-  -moz-appearance: textfield;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #262629;
+  border-radius: 4px;
 }
 
-.custom-scrollbar::-webkit-scrollbar { width: 8px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #262629; border-radius: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Custom Animations for Landing Page */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mapping Tailwind-style 'animate-in' to our keyframes */
+.animate-in {
+  animation-duration: 0.8s;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.slide-in-from-top-4 {
+  animation-name: slideDown;
+}
+
+.slide-in-from-bottom-2,
+.slide-in-from-bottom-4,
+.slide-in-from-bottom-8 {
+  animation-name: fadeIn;
+}
+
+.zoom-in-95 {
+  animation-name: zoomIn;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.duration-700 {
+  animation-duration: 0.7s;
+}
+
+.duration-1000 {
+  animation-duration: 1s;
+}
