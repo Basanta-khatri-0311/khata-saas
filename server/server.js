@@ -13,7 +13,11 @@ const app = express();
 
 app.use(cors()); //for cross-origin requests
 app.use(express.json()); //for parsing application/json
-app.use("/api/transactions", transactionRoute); // Use the transactionRoute for handling transaction-related routes
+
+const authRoute = require("./routes/authRoutes");
+app.use("/api/auth", authRoute);
+
+app.use("/api/transactions", transactionRoute);
 const settingsRoute = require("./routes/settingsRoutes");
 app.use("/api/settings", settingsRoute);
 const PORT = process.env.PORT || 5200;
