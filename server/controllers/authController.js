@@ -8,6 +8,10 @@ const generateToken = (id) => {
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
     try {
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "Please fill in all fields" });
+        }
+        
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: "User already exists" });
 
@@ -19,9 +23,11 @@ const registerUser = async (req, res) => {
                 email: user.email,
                 token: generateToken(user._id)
             });
+        } else {
+            res.status(400).json({ message: "Invalid user data" });
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: error.message || "Registration failed" });
     }
 };
 

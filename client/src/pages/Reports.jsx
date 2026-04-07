@@ -36,7 +36,7 @@ const Reports = () => {
         return true; // ALL
     });
 
-    // Calculate Overall totals for General Pie Chart
+    // Calculate Comparison Pie (Overall Income vs Expense)
     const totalSales = filteredTransactions.filter(t => t.type === 'sale').reduce((a, b) => a + Number(b.amount), 0);
     const totalExpenses = filteredTransactions.filter(t => t.type === 'expense').reduce((a, b) => a + Number(b.amount), 0);
 
@@ -54,11 +54,24 @@ const Reports = () => {
             return acc;
         }, {});
         
-    const dataCategoryPie = Object.entries(expenseCategories)
+    const dataExpensePie = Object.entries(expenseCategories)
         .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value); // largest first
+        .sort((a, b) => b.value - a.value);
 
-    // Group dynamically explicitly by format for the Bar Chart
+    // Calculate Category Breakdown for Income Pie Chart
+    const incomeCategories = filteredTransactions
+        .filter(t => t.type === 'sale')
+        .reduce((acc, tx) => {
+            const cat = tx.category || 'General';
+            acc[cat] = (acc[cat] || 0) + Number(tx.amount);
+            return acc;
+        }, {});
+        
+    const dataIncomePie = Object.entries(incomeCategories)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+
+    // Grouping logic for Bar Chart
     const grouped = filteredTransactions.reduce((acc, tx) => {
         const d = new Date(tx.createdAt);
         const key = timeFilter === 'ALL' ? `${d.getFullYear()}` : `${d.getFullYear()}-${d.getMonth() + 1}`; 
@@ -74,17 +87,18 @@ const Reports = () => {
     const dataBar = Object.values(grouped).sort((a,b) => a.timestamp - b.timestamp);
 
     const COLORS = ['#10b981', '#f43f5e'];
-    const CAT_COLORS = ['#f43f5e', '#f97316', '#eab308', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'];
+    const INC_COLORS = ['#10b981', '#059669', '#34d399', '#064e3b', '#6ee7b7'];
+    const EXP_COLORS = ['#f43f5e', '#e11d48', '#fb7185', '#9f1239', '#fda4af'];
 
     return (
-        <div className="flex flex-col gap-6 h-full min-h-[600px] mb-8">
+        <div className="flex flex-col gap-6 h-full min-h-[600px] mb-12">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Analytics & Reports</h2>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Check your historical comparisons and cash flow breakdown.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white font-sans tracking-tight">Analytics & Reports</h2>
+                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Check your historical comparisons and category distributions.</p>
                 </div>
 
-                <div className="flex bg-white dark:bg-[#0a0a0a] p-1 rounded-xl border border-slate-200 dark:border-white/[0.05] shadow-sm">
+                <div className="flex bg-white dark:bg-[#0a0a0a] p-0 border border-slate-200 dark:border-white/[0.05] shadow-sm">
                     {[
                         { id: '6M', label: 'Last 6 Months' },
                         { id: '1Y', label: 'This Year' },
@@ -93,7 +107,7 @@ const Reports = () => {
                         <button
                             key={f.id}
                             onClick={() => setTimeFilter(f.id)}
-                            className={`px-4 py-2 text-sm font-bold whitespace-nowrap rounded-lg transition-all ${timeFilter === f.id ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-bold whitespace-nowrap transition-all ${timeFilter === f.id ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:hover:text-gray-300'}`}
                         >
                             {f.label}
                         </button>
@@ -101,70 +115,56 @@ const Reports = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 pb-20">
                 
-                {/* Historical Monthly Bar Chart - Spans 2 columns on Desktop */}
-                <div className="lg:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 h-[400px]">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">
-                        Cash Flow Trend {timeFilter === '6M' ? '(Last 6 Months)' : timeFilter === '1Y' ? '(This Year)' : '(All Time Yearly)'}
-                    </h3>
-                    <ResponsiveContainer width="100%" height="80%">
-                        <BarChart data={dataBar} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} opacity={0.2} />
-                            <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
-                            <YAxis tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} width={60} tickFormatter={(value) => `Rs ${value}`} />
-                            <Tooltip cursor={{fill: 'transparent'}} contentStyle={{backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff'}} />
-                            <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                            <Bar dataKey="Income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                            <Bar dataKey="Expenses" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                {/* Historical Monthly Bar Chart */}
+                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-[32px] shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 sm:p-8 h-[450px]">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Cash Flow Trend</h3>
+                    <ResponsiveContainer width="100%" height="85%">
+                        <BarChart data={dataBar}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} opacity={0.15} />
+                            <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 11}} axisLine={false} tickLine={false} />
+                            <YAxis tick={{fill: '#6b7280', fontSize: 11}} axisLine={false} tickLine={false} tickFormatter={(v) => `Rs ${v}`} />
+                            <Tooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: '16px'}} />
+                            <Legend verticalAlign="top" align="right" />
+                            <Bar dataKey="Income" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={32} />
+                            <Bar dataKey="Expenses" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={32} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
 
-                {/* Overall Income vs Expense */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 h-[400px] flex flex-col">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">
-                        Income vs Expense Breakdown
-                    </h3>
+
+                {/* Income Categories */}
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-[32px] shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 h-[400px] flex flex-col">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Income Sources</h3>
                     <div className="flex-1 flex justify-center items-center">
-                        {totalSales === 0 && totalExpenses === 0 ? (
-                            <span className="text-sm font-semibold text-slate-500">No data available.</span>
-                        ) : (
+                        {dataIncomePie.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={dataPie} innerRadius={80} outerRadius={120} paddingAngle={5} dataKey="value">
-                                        {dataPie.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
+                                    <Pie data={dataIncomePie} innerRadius={60} outerRadius={105} paddingAngle={4} dataKey="value" stroke="none">
+                                        {dataIncomePie.map((_, i) => <Cell key={i} fill={INC_COLORS[i % INC_COLORS.length]} />)}
                                     </Pie>
-                                    <Tooltip contentStyle={{backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff'}} />
-                                    <Legend />
+                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: '16px'}} />
                                 </PieChart>
                             </ResponsiveContainer>
-                        )}
+                        ) : <span className="text-sm font-semibold text-slate-500">No income data.</span>}
                     </div>
                 </div>
 
-                {/* Category Breakdown (Expenses Only) */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 h-[400px] flex flex-col">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">
-                        Expense Categories Breakdown
-                    </h3>
+                {/* Expense Categories */}
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-[32px] shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 h-[400px] flex flex-col">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Expense Areas</h3>
                     <div className="flex-1 flex justify-center items-center">
-                        {dataCategoryPie.length === 0 ? (
-                            <span className="text-sm font-semibold text-slate-500">No expense data available.</span>
-                        ) : (
+                        {dataExpensePie.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={dataCategoryPie} innerRadius={60} outerRadius={120} paddingAngle={2} dataKey="value" label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
-                                        {dataCategoryPie.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={CAT_COLORS[index % CAT_COLORS.length]} />
-                                        ))}
+                                    <Pie data={dataExpensePie} innerRadius={60} outerRadius={105} paddingAngle={4} dataKey="value" stroke="none">
+                                        {dataExpensePie.map((_, i) => <Cell key={i} fill={EXP_COLORS[i % EXP_COLORS.length]} />)}
                                     </Pie>
-                                    <Tooltip contentStyle={{backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff'}} />
+                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: '16px'}} />
                                 </PieChart>
                             </ResponsiveContainer>
-                        )}
+                        ) : <span className="text-sm font-semibold text-slate-500">No expense data.</span>}
                     </div>
                 </div>
             </div>

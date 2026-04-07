@@ -68,6 +68,30 @@ const getSummary = async (req, res) => {
     }
 }
 
+const updateTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { amount, type, category, note, createdAt } = req.body;
+
+        const updatedData = { amount, type, category, note };
+        if (createdAt) updatedData.createdAt = createdAt;
+
+        const transaction = await Transaction.findOneAndUpdate(
+            { _id: id, user: req.user.id },
+            updatedData,
+            { new: true, runValidators: true }
+        );
+
+        if (!transaction) {
+            return res.status(404).json({ error: "Transaction not found or unauthorized" });
+        }
+
+        res.status(200).json(transaction);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 const deleteTransaction = async (req, res) => {
     try {
         const { id } = req.params
@@ -116,5 +140,5 @@ const getDayBookSummary = async (req, res) => {
     }
 };
 
-module.exports = { createTransaction, getTransactions, getSummary, deleteTransaction, getDayBookSummary };
+module.exports = { createTransaction, getTransactions, getSummary, deleteTransaction, updateTransaction, getDayBookSummary };
 // Export the createTransaction, getTransaction, and getSummary functions to be used in other parts of the application

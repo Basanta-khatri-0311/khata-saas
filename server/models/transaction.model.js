@@ -1,15 +1,20 @@
 const mongoose = require("mongoose");
-const TRANSACTION_TYES = require("../constants/transactionTypes")
+const TRANSACTION_TYPES = require("../constants/transactionTypes")
 
 const transactionSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
     amount: {
         type: Number,
-        require: true
+        required: true
     },
     type: {
         type: String,
-        enum: Object.values(TRANSACTION_TYES),
-        require: true
+        enum: Object.values(TRANSACTION_TYPES),
+        required: true
     },
     category: {
         type: String,
@@ -24,6 +29,5 @@ const transactionSchema = new mongoose.Schema({
         default: Date.now
     }
 });
-
 
 module.exports = mongoose.model("Transaction", transactionSchema)

@@ -1,11 +1,12 @@
 import React from 'react';
 import { ReceiptText, Calendar, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 import NepaliDate from 'nepali-date-converter';
+import api from '../../services/api';
 
 const formatNPR = (val) =>
     'Rs. ' + Number(val || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-const TransactionTable = ({ transactions, searchQuery, loading, deleteTransaction }) => {
+const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit }) => {
     
     // Search Functionality Filter
     const filteredTransactions = transactions.filter(tx => {
@@ -17,9 +18,9 @@ const TransactionTable = ({ transactions, searchQuery, loading, deleteTransactio
     });
 
     return (
-        <div className="flex flex-col bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] overflow-hidden h-full max-h-[600px] transition-colors">
+        <div className="flex flex-col bg-white dark:bg-[#0a0a0a] rounded-2xl shadow-sm border border-slate-200 dark:border-white/[0.05] overflow-hidden h-full max-h-[600px] transition-colors">
             <div className="px-5 sm:px-6 py-5 border-b border-slate-100 dark:border-white/[0.05] flex items-center justify-between sticky top-0 bg-white dark:bg-[#0a0a0a] z-10 transition-colors">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Recent Ledger</h2>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-wider">Recent Ledger</h2>
                 <div className="flex items-center gap-3">
                     <span className="text-xs font-bold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-white/[0.05] border border-transparent dark:border-white/[0.05] px-2.5 py-1 rounded-full">
                         {filteredTransactions.length} entries
@@ -35,8 +36,8 @@ const TransactionTable = ({ transactions, searchQuery, loading, deleteTransactio
                                 <th
                                     key={i}
                                     className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/[0.05] bg-white dark:bg-[#0a0a0a] transition-colors
-                                        ${h === 'Amount' ? 'text-right' : ''}
-                                        ${h === '' ? 'w-10' : ''}`}
+                                        ${h === 'Date' || h === 'Details' || h === 'Amount' ? 'w-[30%] sm:w-[32%]' : 'w-20'}
+                                        ${h === 'Amount' ? 'text-right' : ''}`}
                                 >{h}</th>
                             ))}
                         </tr>
@@ -56,7 +57,6 @@ const TransactionTable = ({ transactions, searchQuery, loading, deleteTransactio
                         {!loading && filteredTransactions.length === 0 && (
                             <tr>
                                 <td colSpan={4} className="py-32">
-                                    {/* Centered zero state using absolute/inset alignment inside table */}
                                     <div className="absolute inset-x-0 bottom-0 top-[100px] flex flex-col items-center justify-center gap-4">
                                         <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center transition-colors">
                                             <ReceiptText className="w-8 h-8 text-slate-300 dark:text-gray-600" strokeWidth={1.5} />
@@ -108,14 +108,30 @@ const TransactionTable = ({ transactions, searchQuery, loading, deleteTransactio
                                             {isSale ? '+' : '-'}{formatNPR(tx.amount)}
                                         </span>
                                     </td>
-                                    <td className="p-2 sm:p-4 w-10 align-middle text-right px-2 sm:px-4">
-                                        <button
-                                            onClick={() => deleteTransaction(tx._id)}
-                                            className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-gray-400 opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 dark:hover:border-rose-500/30 transition-all active:scale-95 shadow-sm"
-                                            title="Delete entry"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                    <td className="p-2 sm:p-4 w-28 align-middle text-right px-2 sm:px-4">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => onEdit(tx)}
+                                                className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-gray-400 opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all active:scale-95 shadow-sm"
+                                                title="Edit entry"
+                                            >
+                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            </button>
+                                            <button
+                                                onClick={async () => {
+                                                    if (window.confirm("Delete this entry?")) {
+                                                        try {
+                                                            await api.delete(`/transactions/${tx._id}`);
+                                                            onDelete();
+                                                        } catch (err) { console.error(err); }
+                                                    }
+                                                }}
+                                                className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-gray-400 opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 dark:hover:border-rose-500/30 transition-all active:scale-95 shadow-sm"
+                                                title="Delete entry"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             )
