@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -21,7 +22,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     ? 'translate-x-0 w-[280px] p-6' 
                     : '-translate-x-full md:translate-x-0 md:w-[84px] p-6 md:p-4 md:py-6'}
             `}>
-                {/* Desktop Toggle Button */}
+                {/* ... */}
                 <button 
                     onClick={() => setIsOpen(!isOpen)}
                     className="absolute -right-3 top-8 hidden md:flex items-center justify-center w-6 h-6 bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/10 rounded-full shadow-sm text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white transition-transform z-50"
@@ -52,23 +53,27 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 <nav className="flex flex-col gap-2 flex-1 mt-8">
                     {isOpen && <div className="text-[11px] font-semibold text-slate-400 dark:text-gray-600 uppercase tracking-wider mb-2 px-3 whitespace-nowrap transition-opacity">Menu</div>}
                     {[
-                        { label: 'Dashboard', icon: LayoutDashboard, active: true },
-                        { label: 'Transactions', icon: ReceiptText, active: false },
-                        { label: 'Reports', icon: PieChart, active: false },
-                    ].map(({ label, icon: Icon, active }) => (
-                        <a
+                        { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+                        { label: 'Transactions', path: '/transactions', icon: ReceiptText },
+                        { label: 'Reports', path: '/reports', icon: PieChart },
+                    ].map(({ label, path, icon: Icon }) => (
+                        <NavLink
                             key={label}
-                            href="#"
-                            className={`flex items-center ${isOpen ? 'gap-3 px-3' : 'justify-center px-0'} py-3 rounded-xl transition-all duration-200 group
-                                ${active
+                            to={path}
+                            className={({ isActive }) => `flex items-center ${isOpen ? 'gap-3 px-3' : 'justify-center px-0'} py-3 rounded-xl transition-all duration-200 group
+                                ${isActive
                                     ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400'
                                     : 'text-slate-600 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
                                 }`}
                             title={!isOpen ? label : ''}
                         >
-                            <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-gray-500 group-hover:text-slate-600 dark:group-hover:text-gray-400'} transition-colors`} strokeWidth={isOpen ? 2 : 2.5} />
-                            {isOpen && <span className="text-[14px] font-medium whitespace-nowrap overflow-hidden">{label}</span>}
-                        </a>
+                            {({ isActive }) => (
+                                <>
+                                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-gray-500 group-hover:text-slate-600 dark:group-hover:text-gray-400'} transition-colors`} strokeWidth={isOpen ? 2 : 2.5} />
+                                    {isOpen && <span className="text-[14px] font-medium whitespace-nowrap overflow-hidden">{label}</span>}
+                                </>
+                            )}
+                        </NavLink>
                     ))}
                 </nav>
             </aside>
