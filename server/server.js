@@ -18,6 +18,8 @@ const authRoute = require("./routes/authRoutes");
 app.use("/api/auth", authRoute);
 
 app.use("/api/transactions", transactionRoute);
+const adminRoute = require("./routes/adminRoutes");
+app.use("/api/admin", adminRoute);
 const settingsRoute = require("./routes/settingsRoutes");
 app.use("/api/settings", settingsRoute);
 const PORT = process.env.PORT || 5200;

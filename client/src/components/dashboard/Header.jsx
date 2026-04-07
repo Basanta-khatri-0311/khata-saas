@@ -1,10 +1,13 @@
 import React from 'react';
 import { Search, Calendar, Menu, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import NepaliDate from 'nepali-date-converter';
 
 const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }) => {
     const { theme, toggleTheme } = useTheme();
+    const { user } = useAuth();
+    const isAdmin = user?.role === 'admin';
     const npDate = new NepaliDate();
 
     return (
@@ -17,7 +20,9 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }
                     <Menu className="w-6 h-6" />
                 </button>
                 <div className="flex flex-col hidden sm:flex">
-                    <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Overview</h1>
+                    <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                        {isAdmin ? 'Command Center' : 'Overview'}
+                    </h1>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 mt-1">Status: Operational</p>
                 </div>
             </div>
@@ -29,7 +34,7 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }
                         type="text" 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search ledger..." 
+                        placeholder={isAdmin ? "Search registry..." : "Search ledger..."} 
                         className="h-10 w-full pl-9 pr-4 bg-slate-100 dark:bg-white/5 border-none rounded-full text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-500" 
                     />
                 </div>

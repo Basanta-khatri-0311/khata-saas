@@ -18,8 +18,12 @@ const Register = () => {
         setError('');
         setLoading(true);
         try {
-            await register(name, email, password);
-            navigate('/dashboard');
+            const user = await register({ name, email, password });
+            if (user?.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed. Try again.');
         } finally {

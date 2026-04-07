@@ -14,6 +14,16 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'user'],
+        default: 'user'
+    },
+    status: {
+        type: String,
+        enum: ['active', 'pending', 'suspended'],
+        default: 'pending'
     }
 }, { timestamps: true });
 

@@ -15,12 +15,24 @@ const registerUser = async (req, res) => {
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: "User already exists" });
 
-        const user = await User.create({ name, email, password });
+        // Logic for first admin only
+        let finalRole = "user";
+        let finalStatus = "pending";
+        
+        const adminCount = await User.countDocuments({ role: 'admin' });
+        if (adminCount === 0 && req.body.role === 'admin') {
+            finalRole = 'admin';
+            finalStatus = req.body.status || 'active'; // Allow passing status too if they want
+        }
+
+        const user = await User.create({ name, email, password, role: finalRole, status: finalStatus });
         if (user) {
             res.status(201).json({
-                _id: user.id,
+                _id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
+                status: user.status,
                 token: generateToken(user._id)
             });
         } else {
@@ -36,10 +48,16 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (user && (await user.matchPassword(password))) {
+            if (user.status === 'suspended') {
+                return res.status(403).json({ message: "Your account has been suspended. Please contact admin." });
+            }
+
             res.json({
-                _id: user.id,
+                _id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
+                status: user.status,
                 token: generateToken(user._id)
             });
         } else {

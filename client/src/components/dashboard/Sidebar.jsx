@@ -1,12 +1,26 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight, Settings as SettingsIcon, LogOut } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight, Settings as SettingsIcon, LogOut, ShieldCheck } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
     const { settings } = useSettings();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
+    const isAdmin = user?.role === 'admin';
+
+    const businessItems = [
+        { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { label: 'Transactions', path: '/transactions', icon: ReceiptText },
+        { label: 'Reports', path: '/reports', icon: PieChart },
+        { label: 'Settings', path: '/settings', icon: SettingsIcon },
+    ];
+
+    const adminItems = [
+        { label: 'Admin Panel', path: '/admin', icon: ShieldCheck },
+    ];
+
+    const menuItems = isAdmin ? adminItems : businessItems;
 
     return (
         <>
@@ -61,12 +75,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 
                 <nav className="flex flex-col gap-2 flex-1 mt-8">
                     {isOpen && <div className="text-[11px] font-semibold text-slate-400 dark:text-gray-600 uppercase tracking-wider mb-2 px-3 whitespace-nowrap transition-opacity">Menu</div>}
-                    {[
-                        { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-                        { label: 'Transactions', path: '/transactions', icon: ReceiptText },
-                        { label: 'Reports', path: '/reports', icon: PieChart },
-                        { label: 'Settings', path: '/settings', icon: SettingsIcon },
-                    ].map(({ label, path, icon: Icon }) => (
+                    {menuItems.map(({ label, path, icon: Icon }) => (
                         <NavLink
                             key={label}
                             to={path}
