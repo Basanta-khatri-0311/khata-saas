@@ -25,9 +25,9 @@ const MainLayout = () => {
 
             {/* Main Content */}
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative border-l border-transparent dark:border-white/[0.05]">
-                <Header 
+                <Header
                     isSidebarOpen={isSidebarOpen}
-                    setIsSidebarOpen={setIsSidebarOpen} 
+                    setIsSidebarOpen={setIsSidebarOpen}
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                 />

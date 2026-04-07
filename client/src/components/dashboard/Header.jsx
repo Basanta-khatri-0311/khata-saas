@@ -1,9 +1,11 @@
 import React from 'react';
-import { Search, Bell, Menu, Sun, Moon } from 'lucide-react';
+import { Search, Calendar, Menu, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import NepaliDate from 'nepali-date-converter';
 
 const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }) => {
     const { theme, toggleTheme } = useTheme();
+    const npDate = new NepaliDate();
 
     return (
         <header className="h-20 flex items-center justify-between px-4 sm:px-8 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/[0.05] shrink-0 z-10 transition-colors duration-300">
@@ -15,8 +17,8 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }
                     <Menu className="w-6 h-6" />
                 </button>
                 <div className="flex flex-col hidden sm:flex">
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Overview</h1>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 font-medium">Welcome back, here's your financial summary.</p>
+                    <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Overview</h1>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-gray-500 mt-1">Status: Operational</p>
                 </div>
             </div>
 
@@ -27,7 +29,7 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }
                         type="text" 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search notes..." 
+                        placeholder="Search ledger..." 
                         className="h-10 w-full pl-9 pr-4 bg-slate-100 dark:bg-white/5 border-none rounded-full text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-500" 
                     />
                 </div>
@@ -39,10 +41,12 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }
                     {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
 
-                <button className="hidden sm:flex w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 items-center justify-center text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors relative">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-black"></span>
-                </button>
+                <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
+                    <Calendar className="w-4 h-4 text-indigo-500" strokeWidth={2.5} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-gray-300">
+                        {npDate.format('YYYY MMMM DD')} B.S.
+                    </span>
+                </div>
             </div>
         </header>
     );

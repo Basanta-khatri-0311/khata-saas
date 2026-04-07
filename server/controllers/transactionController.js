@@ -72,22 +72,35 @@ const updateTransaction = async (req, res) => {
     try {
         const { id } = req.params;
         const { amount, type, category, note, createdAt } = req.body;
-
-        const updatedData = { amount, type, category, note };
-        if (createdAt) updatedData.createdAt = createdAt;
+        
+        console.log(`[UPDATE] ID: ${id}, User: ${req.user?._id}`);
+        
+        const updatedData = { 
+            amount: Number(amount), 
+            type, 
+            category: category || "General", 
+            note 
+        };
+        
+        if (createdAt) {
+            updatedData.createdAt = new Date(createdAt);
+        }
 
         const transaction = await Transaction.findOneAndUpdate(
-            { _id: id, user: req.user.id },
+            { _id: id, user: req.user._id },
             updatedData,
             { new: true, runValidators: true }
         );
 
         if (!transaction) {
-            return res.status(404).json({ error: "Transaction not found or unauthorized" });
+            console.log(`[UPDATE] Failed: Transaction ${id} not found for User ${req.user._id}`);
+            return res.status(404).json({ error: "Transaction not found or you don't have permission to edit it." });
         }
 
+        console.log(`[UPDATE] Success: ${id}`);
         res.status(200).json(transaction);
     } catch (error) {
+        console.error(`[UPDATE] Error: ${error.message}`);
         res.status(500).json({ error: error.message });
     }
 }

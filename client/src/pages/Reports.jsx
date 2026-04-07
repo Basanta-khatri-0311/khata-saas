@@ -86,28 +86,27 @@ const Reports = () => {
 
     const dataBar = Object.values(grouped).sort((a,b) => a.timestamp - b.timestamp);
 
-    const COLORS = ['#10b981', '#f43f5e'];
     const INC_COLORS = ['#10b981', '#059669', '#34d399', '#064e3b', '#6ee7b7'];
     const EXP_COLORS = ['#f43f5e', '#e11d48', '#fb7185', '#9f1239', '#fda4af'];
 
     return (
-        <div className="flex flex-col gap-6 h-full min-h-[600px] mb-12">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-8 pb-10 max-w-full font-sans">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white font-sans tracking-tight">Analytics & Reports</h2>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Check your historical comparisons and category distributions.</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Analytics</h1>
+                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Monitor your financial performance metrics.</p>
                 </div>
 
-                <div className="flex bg-white dark:bg-[#0a0a0a] p-0 border border-slate-200 dark:border-white/[0.05] shadow-sm">
+                <div className="flex bg-white dark:bg-[#0a0a0a] p-1 rounded-xl border border-slate-200 dark:border-white/[0.05] shadow-sm">
                     {[
-                        { id: '6M', label: 'Last 6 Months' },
+                        { id: '6M', label: '6 Months' },
                         { id: '1Y', label: 'This Year' },
                         { id: 'ALL', label: 'All Time' },
                     ].map(f => (
                         <button
                             key={f.id}
                             onClick={() => setTimeFilter(f.id)}
-                            className={`px-4 py-2 text-sm font-bold whitespace-nowrap transition-all ${timeFilter === f.id ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-[10px] uppercase tracking-widest font-black rounded-lg transition-all ${timeFilter === f.id ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:hover:text-gray-300'}`}
                         >
                             {f.label}
                         </button>
@@ -115,19 +114,19 @@ const Reports = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 pb-20">
                 
                 {/* Historical Monthly Bar Chart */}
-                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-[32px] shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 sm:p-8 h-[450px]">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Cash Flow Trend</h3>
-                    <ResponsiveContainer width="100%" height="85%">
+                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 sm:p-8 h-[450px]">
+                    <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-8 uppercase tracking-widest">Cash Flow Trend</h3>
+                    <ResponsiveContainer width="100%" height="80%">
                         <BarChart data={dataBar}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} opacity={0.15} />
-                            <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 11}} axisLine={false} tickLine={false} />
-                            <YAxis tick={{fill: '#6b7280', fontSize: 11}} axisLine={false} tickLine={false} tickFormatter={(v) => `Rs ${v}`} />
-                            <Tooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: '16px'}} />
-                            <Legend verticalAlign="top" align="right" />
-                            <Bar dataKey="Income" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={32} />
+                            <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 10, fontWeight: 700}} axisLine={false} tickLine={false} />
+                            <YAxis tick={{fill: '#6b7280', fontSize: 10, fontWeight: 700}} axisLine={false} tickLine={false} tickFormatter={(v) => `Rs ${v}`} />
+                            <Tooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '12px'}} />
+                            <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px'}} />
+                            <Bar dataKey="Income" fill="#6366f1" radius={[6, 6, 0, 0]} maxBarSize={32} />
                             <Bar dataKey="Expenses" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={32} />
                         </BarChart>
                     </ResponsiveContainer>
@@ -135,36 +134,38 @@ const Reports = () => {
 
 
                 {/* Income Categories */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-[32px] shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 h-[400px] flex flex-col">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Income Sources</h3>
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col">
+                    <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-4 uppercase tracking-widest">Income Breakdown</h3>
                     <div className="flex-1 flex justify-center items-center">
                         {dataIncomePie.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={dataIncomePie} innerRadius={60} outerRadius={105} paddingAngle={4} dataKey="value" stroke="none">
+                                    <Pie data={dataIncomePie} innerRadius={80} outerRadius={120} paddingAngle={4} dataKey="value" stroke="none">
                                         {dataIncomePie.map((_, i) => <Cell key={i} fill={INC_COLORS[i % INC_COLORS.length]} />)}
                                     </Pie>
-                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: '16px'}} />
+                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff'}} />
+                                    <Legend iconType="circle" wrapperStyle={{fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px'}} />
                                 </PieChart>
                             </ResponsiveContainer>
-                        ) : <span className="text-sm font-semibold text-slate-500">No income data.</span>}
+                        ) : <span className="text-sm font-black text-slate-400 uppercase tracking-widest">No income recorded</span>}
                     </div>
                 </div>
 
                 {/* Expense Categories */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-[32px] shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 h-[400px] flex flex-col">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Expense Areas</h3>
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col">
+                    <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-4 uppercase tracking-widest">Expense Distribution</h3>
                     <div className="flex-1 flex justify-center items-center">
                         {dataExpensePie.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={dataExpensePie} innerRadius={60} outerRadius={105} paddingAngle={4} dataKey="value" stroke="none">
+                                    <Pie data={dataExpensePie} innerRadius={80} outerRadius={120} paddingAngle={4} dataKey="value" stroke="none">
                                         {dataExpensePie.map((_, i) => <Cell key={i} fill={EXP_COLORS[i % EXP_COLORS.length]} />)}
                                     </Pie>
-                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: '16px'}} />
+                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff'}} />
+                                    <Legend iconType="circle" wrapperStyle={{fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px'}} />
                                 </PieChart>
                             </ResponsiveContainer>
-                        ) : <span className="text-sm font-semibold text-slate-500">No expense data.</span>}
+                        ) : <span className="text-sm font-black text-slate-400 uppercase tracking-widest">No expenses recorded</span>}
                     </div>
                 </div>
             </div>

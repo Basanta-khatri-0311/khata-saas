@@ -10,11 +10,13 @@ import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
     return (
         <AuthProvider>
             <SettingsProvider>
+                <Toaster position="top-right" reverseOrder={false} />
                 <Router>
                     <Routes>
                         <Route path="/login" element={<Login />} />

@@ -3,24 +3,28 @@ import { useOutletContext } from 'react-router-dom';
 import StatsCards from '../components/dashboard/StatsCards';
 import TransactionTable from '../components/dashboard/TransactionTable';
 import TransactionModal from '../components/dashboard/TransactionModal';
+import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
 import api from '../services/api';
 import { Plus, Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
     const { searchQuery } = useOutletContext();
     const [summary, setSummary] = useState({ totalSales: 0, totalExpenses: 0, profit: 0 });
     const [transactions, setTransactions] = useState([]);
-
+    
     // Modal & Form State
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [transactionToDelete, setTransactionToDelete] = useState(null);
     const [editingTransaction, setEditingTransaction] = useState(null);
-
+    
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('sale');
     const [category, setCategory] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [note, setNote] = useState('');
-
+    
     // App State
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -53,18 +57,40 @@ const Dashboard = () => {
         setSubmitting(true);
         try {
             const payload = { amount, type, category, note, createdAt: date };
-
+            
             if (editingTransaction) {
                 await api.put(`/transactions/${editingTransaction._id}`, payload);
+                toast.success('Transaction Updated ✨');
             } else {
                 await api.post('/transactions', payload);
+                toast.success('Transaction Recorded 🚀');
             }
 
             resetForm();
             await Promise.all([fetchSummary(), fetchTransactions()]);
             setIsModalOpen(false);
-        } catch (err) { console.error(err); }
+        } catch (err) { 
+            console.error(err); 
+            toast.error(err.response?.data?.error || 'Failed to save');
+        }
         finally { setSubmitting(false); }
+    };
+
+    const handleDelete = async () => {
+        if (!transactionToDelete) return;
+        setSubmitting(true);
+        try {
+            await api.delete(`/transactions/${transactionToDelete}`);
+            toast.success('Transaction Removed 🗑️');
+            await Promise.all([fetchTransactions(), fetchSummary()]);
+            setIsDeleteModalOpen(false);
+            setTransactionToDelete(null);
+        } catch (err) {
+            console.error(err);
+            toast.error('Failed to delete transaction');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const resetForm = () => {
@@ -86,13 +112,16 @@ const Dashboard = () => {
         setIsModalOpen(true);
     };
 
-    const filteredTransactions = transactions.filter(tx => {
-        const search = searchQuery?.toLowerCase() || "";
-        return (
-            (tx.note?.toLowerCase().includes(search)) ||
-            (tx.category?.toLowerCase().includes(search)) ||
-            (tx.amount.toString().includes(search))
-        );
+    const openDeleteModal = (id) => {
+        setTransactionToDelete(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const todayDateStr = new Date().toISOString().split('T')[0];
+
+    const todaysTransactions = transactions.filter(tx => {
+        const txDate = new Date(tx.createdAt).toISOString().split('T')[0];
+        return txDate === todayDateStr;
     });
 
     if (loading) return (
@@ -106,13 +135,13 @@ const Dashboard = () => {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Overview</h1>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Your financial status at a glance.</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Overview</h1>
+                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Today at a glance.</p>
                 </div>
-
-                <button
+                
+                <button 
                     onClick={() => { resetForm(); setIsModalOpen(true); }}
-                    className="flex items-center justify-center gap-2 px-8 h-14 bg-black dark:bg-white text-white dark:text-black font-black rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] active:scale-95 transition-all"
+                    className="flex items-center justify-center gap-2 px-8 h-14 bg-black dark:bg-white text-white dark:text-black font-black rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] active:scale-95 transition-all transition-colors"
                 >
                     <Plus className="w-5 h-5" strokeWidth={3} />
                     New Entry
@@ -123,30 +152,27 @@ const Dashboard = () => {
             <div className="flex flex-col gap-10">
                 <StatsCards summary={summary} />
 
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl shadow-sm border border-slate-200 dark:border-white/[0.05] overflow-hidden flex flex-col min-h-[500px]">
-
-
+                <div className="flex flex-col gap-4">
                     {searchQuery && (
-                        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-sm font-bold animate-in fade-in slide-in-from-right-4">
+                        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-sm font-bold w-fit animate-in fade-in slide-in-from-left-4">
                             <Search className="w-4 h-4" />
-                            "{searchQuery}"
+                            Showing results for: "{searchQuery}"
                         </div>
                     )}
-
-
-                    <div className="flex-1 overflow-x-auto">
-                        <TransactionTable
-                            transactions={filteredTransactions}
-                            onDelete={fetchTransactions}
-                            onUpdate={fetchSummary}
-                            onEdit={openEditModal}
-                        />
-                    </div>
+                    
+                    <TransactionTable 
+                        transactions={todaysTransactions} 
+                        searchQuery={searchQuery}
+                        onUpdate={fetchSummary}
+                        onEdit={openEditModal}
+                        onDelete={openDeleteModal}
+                        title="Today's Transactions"
+                    />
                 </div>
             </div>
 
             {/* Transaction Modal */}
-            <TransactionModal
+            <TransactionModal 
                 isOpen={isModalOpen}
                 onClose={() => { setIsModalOpen(false); setEditingTransaction(null); }}
                 addTransaction={handleSave}
@@ -162,6 +188,14 @@ const Dashboard = () => {
                 date={date}
                 setDate={setDate}
                 isEditing={!!editingTransaction}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => { setIsDeleteModalOpen(false); setTransactionToDelete(null); }}
+                onConfirm={handleDelete}
+                submitting={submitting}
             />
         </div>
     );
