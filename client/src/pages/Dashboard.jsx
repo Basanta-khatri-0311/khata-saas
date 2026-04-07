@@ -1,259 +1,138 @@
-import { useState, useEffect } from 'react'
-import api from '../services/api'
+import { useState, useEffect } from 'react';
+import api from '../services/api';
+
+// Components
+import Sidebar from '../components/dashboard/Sidebar';
+import Header from '../components/dashboard/Header';
+import StatsCards from '../components/dashboard/StatsCards';
+import TransactionForm from '../components/dashboard/TransactionForm';
+import TransactionTable from '../components/dashboard/TransactionTable';
 
 const Dashboard = () => {
-    const [summary, setSummary] = useState({ totalSales: 0, totalExpenses: 0, profit: 0 })
-    const [transactions, setTransactions] = useState([])
-    const [amount, setAmount] = useState('')
-    const [type, setType] = useState('sale')
-    const [note, setNote] = useState('')
-    const [loading, setLoading] = useState(true)
-    const [submitting, setSubmitting] = useState(false)
+    const [summary, setSummary] = useState({ totalSales: 0, totalExpenses: 0, profit: 0 });
+    const [transactions, setTransactions] = useState([]);
+    
+    // Form State
+    const [amount, setAmount] = useState('');
+    const [type, setType] = useState('sale');
+    const [note, setNote] = useState('');
+    
+    // App State
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    
+    // Initialize Sidebar to be open on larger screens and closed on mobile automatically
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
 
     useEffect(() => {
-        Promise.all([fetchSummary(), fetchTransactions()]).finally(() => setLoading(false))
-    }, [])
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setIsSidebarOpen(false);
+            } else {
+                setIsSidebarOpen(true);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        Promise.all([fetchSummary(), fetchTransactions()]).finally(() => setLoading(false));
+    }, []);
 
     const fetchSummary = async () => {
         try {
-            const res = await api.get('/transactions/summary')
-            setSummary(res.data)
-        } catch (err) { console.error(err) }
-    }
+            const res = await api.get('/transactions/summary');
+            setSummary(res.data);
+        } catch (err) { console.error(err); }
+    };
 
     const fetchTransactions = async () => {
         try {
-            const res = await api.get('/transactions')
-            setTransactions(res.data)
-        } catch (err) { console.error(err) }
-    }
+            const res = await api.get('/transactions');
+            setTransactions(res.data);
+        } catch (err) { console.error(err); }
+    };
 
     const addTransaction = async (e) => {
-        e.preventDefault()
-        setSubmitting(true)
+        e.preventDefault();
+        setSubmitting(true);
         try {
-            await api.post('/transactions', { amount, type, note })
-            setAmount('')
-            setNote('')
-            await Promise.all([fetchSummary(), fetchTransactions()])
-        } catch (err) { console.error(err) }
-        finally { setSubmitting(false) }
-    }
+            await api.post('/transactions', { amount, type, note });
+            setAmount('');
+            setNote('');
+            await Promise.all([fetchSummary(), fetchTransactions()]);
+        } catch (err) { console.error(err); }
+        finally { setSubmitting(false); }
+    };
 
     const deleteTransaction = async (id) => {
         try {
-            await api.delete(`/transactions/${id}`)
-            await Promise.all([fetchTransactions(), fetchSummary()])
-        } catch (err) { console.error(err) }
-    }
-
-    const formatNPR = (val) =>
-        'Rs. ' + Number(val || 0).toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-
-    const profitPositive = (summary.profit || 0) >= 0
+            await api.delete(`/transactions/${id}`);
+            await Promise.all([fetchTransactions(), fetchSummary()]);
+        } catch (err) { console.error(err); }
+    };
 
     return (
-        <div className="flex h-screen bg-[#0f0f10] text-[#ececed] overflow-hidden">
+        <div className="flex h-screen bg-[#F8FAFC] dark:bg-black text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-500/30 overflow-hidden">
+            
+            <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-            {/* Sidebar */}
-            <aside className="hidden md:flex w-56 flex-col border-r border-white/[0.07] bg-[#0f0f10] px-3 py-5 gap-6 shrink-0">
-                <div className="flex items-center gap-2.5 px-2 py-1">
-                    <span className="w-6 h-6 rounded-md bg-blue-500 shrink-0 block" />
-                    <span className="text-base font-semibold tracking-tight">Ledger</span>
-                </div>
-                <nav className="flex flex-col gap-0.5">
-                    {[
-                        { label: 'Dashboard', active: true },
-                        { label: 'Transactions', active: false },
-                        { label: 'Reports', active: false },
-                    ].map(({ label, active }) => (
-                        <a
-                            key={label}
-                            className={`flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm cursor-pointer transition-colors
-                                ${active
-                                    ? 'bg-white/[0.07] text-[#ececed] font-medium'
-                                    : 'text-[#9191a0] hover:bg-white/5 hover:text-[#ececed]'
-                                }`}
-                        >
-                            {label}
-                        </a>
-                    ))}
-                </nav>
-            </aside>
+            {/* Main Content */}
+            <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative border-l border-transparent dark:border-white/[0.05]">
+                
+                <Header 
+                    isSidebarOpen={isSidebarOpen}
+                    setIsSidebarOpen={setIsSidebarOpen} 
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                />
 
-            {/* Main */}
-            <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+                {/* Dashboard Body */}
+                <div className="flex-1 overflow-y-auto w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6 sm:gap-8 pb-24 custom-scrollbar">
 
-                {/* Topbar */}
-                <header className="h-14 flex items-center justify-between border-b border-white/[0.07] px-8 shrink-0">
-                    <span className="text-[15px] font-medium">Dashboard</span>
-                    <button
-                        onClick={() => document.getElementById('amount-input').focus()}
-                        className="flex items-center gap-2 bg-blue-500 hover:bg-blue-400 transition-colors text-white text-[13px] font-medium px-4 py-2 rounded-md"
-                    >
-                        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                            <path d="M5.5 1v9M1 5.5h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                        </svg>
-                        New Transaction
-                    </button>
-                </header>
+                    <StatsCards summary={summary} />
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto px-8 py-9 flex flex-col gap-8">
-
-                    {/* Stats */}
-                    <div className="flex divide-x divide-white/[0.07] border border-white/[0.07] rounded-xl bg-[#161618] overflow-hidden max-sm:flex-col max-sm:divide-x-0 max-sm:divide-y">
-                        {[
-                            { label: 'Total Sales', value: formatNPR(summary.totalSales), color: 'text-emerald-400' },
-                            { label: 'Total Expenses', value: formatNPR(summary.totalExpenses), color: 'text-red-400' },
-                            { label: 'Net Profit', value: formatNPR(summary.profit), color: profitPositive ? 'text-[#ececed]' : 'text-red-400' },
-                        ].map(({ label, value, color }) => (
-                            <div key={label} className="flex-1 px-8 py-7 flex flex-col gap-2.5">
-                                <span className="text-[11px] font-medium uppercase tracking-widest text-[#56565f]">{label}</span>
-                                <span className={`font-mono text-3xl font-medium tracking-tight ${color}`}>{value}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* New Transaction */}
-                    <div className="border border-white/[0.07] rounded-xl bg-[#161618] overflow-hidden">
-                        <div className="px-5 py-3.5 border-b border-white/[0.07]">
-                            <span className="text-[13px] font-medium text-[#9191a0]">New Transaction</span>
-                        </div>
-                        <form onSubmit={addTransaction} className="flex items-center gap-2.5 px-5 py-4 flex-wrap">
-                            <input
-                                id="amount-input"
-                                type="number"
-                                placeholder="Amount (Rs.)"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                                required
-                                min="0"
-                                step="0.01"
-                                className="h-10 w-44 bg-[#1c1c1f] border border-white/[0.07] rounded-md px-3 text-[14px] text-[#ececed] placeholder-[#56565f] outline-none focus:border-white/20 transition-colors"
+                    {/* Content Grid */}
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
+                        
+                        <div className="xl:col-span-1">
+                            <TransactionForm 
+                                addTransaction={addTransaction}
+                                submitting={submitting}
+                                amount={amount}
+                                setAmount={setAmount}
+                                note={note}
+                                setNote={setNote}
+                                type={type}
+                                setType={setType}
                             />
+                        </div>
 
-                            {/* Type toggle */}
-                            <div className="flex h-10 border border-white/[0.07] rounded-md overflow-hidden shrink-0">
-                                <button
-                                    type="button"
-                                    onClick={() => setType('sale')}
-                                    className={`px-4 text-[13px] font-medium transition-colors
-                                        ${type === 'sale'
-                                            ? 'bg-emerald-400/10 text-emerald-400'
-                                            : 'bg-[#1c1c1f] text-[#56565f] hover:text-[#ececed]'
-                                        }`}
-                                >Sale</button>
-                                <div className="w-px bg-white/[0.07]" />
-                                <button
-                                    type="button"
-                                    onClick={() => setType('expense')}
-                                    className={`px-4 text-[13px] font-medium transition-colors
-                                        ${type === 'expense'
-                                            ? 'bg-red-400/10 text-red-400'
-                                            : 'bg-[#1c1c1f] text-[#56565f] hover:text-[#ececed]'
-                                        }`}
-                                >Expense</button>
-                            </div>
-
-                            <input
-                                type="text"
-                                placeholder="Add a note..."
-                                value={note}
-                                onChange={(e) => setNote(e.target.value)}
-                                className="h-10 flex-1 min-w-45 bg-[#1c1c1f] border border-white/[0.07] rounded-md px-3 text-[14px] text-[#ececed] placeholder-[#56565f] outline-none focus:border-white/20 transition-colors"
+                        <div className="xl:col-span-2 flex flex-col h-full min-h-[400px]">
+                            <TransactionTable 
+                                transactions={transactions}
+                                searchQuery={searchQuery}
+                                loading={loading}
+                                deleteTransaction={deleteTransaction}
                             />
-
-                            <button
-                                type="submit"
-                                disabled={submitting || !amount}
-                                className="h-10 px-5 bg-[#1c1c1f] border border-white/[0.07] hover:bg-white/[0.07] hover:border-white/12 text-[#ececed] text-[13px] font-medium rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
-                            >
-                                {submitting ? 'Saving...' : 'Save'}
-                            </button>
-                        </form>
-                    </div>
-
-                    {/* Transactions Table */}
-                    <div className="border border-white/[0.07] rounded-xl bg-[#161618] overflow-hidden">
-                        <div className="px-5 py-3.5 border-b border-white/[0.07] flex items-center gap-2.5">
-                            <span className="text-[13px] font-medium text-[#9191a0]">Transactions</span>
-                            <span className="inline-flex items-center justify-center h-5 min-w-5.5 px-1.5 bg-[#1c1c1f] border border-white/[0.07] rounded text-[11px] font-mono text-[#56565f]">
-                                {transactions.length}
-                            </span>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr>
-                                        {['Type', 'Note', 'Amount', ''].map((h, i) => (
-                                            <th
-                                                key={i}
-                                                className={`px-5 py-3 text-left text-[11px] font-medium uppercase tracking-widest text-[#56565f] border-b border-white/[0.07] whitespace-nowrap
-                                                    ${h === 'Amount' ? 'text-right' : ''}
-                                                    ${h === '' ? 'w-px' : ''}`}
-                                            >{h}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {loading ? (
-                                        <tr>
-                                            <td colSpan={4} className="py-14 text-center text-[#56565f]">
-                                                <span className="inline-flex gap-1.5 items-center">
-                                                    {[0, 200, 400].map(d => (
-                                                        <span key={d} className="w-1.5 h-1.5 rounded-full bg-[#56565f] animate-pulse" style={{ animationDelay: `${d}ms` }} />
-                                                    ))}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ) : transactions.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={4} className="py-14 text-center text-[13px] text-[#56565f] italic">
-                                                No transactions recorded yet
-                                            </td>
-                                        </tr>
-                                    ) : transactions.map((tx) => (
-                                        <tr key={tx._id} className="border-b border-white/4 last:border-0 hover:bg-white/3 transition-colors group">
-                                            <td className="px-5 py-3.5 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2.5 py-1 rounded text-[12px] font-medium capitalize
-                                                    ${tx.type === 'sale'
-                                                        ? 'bg-emerald-400/10 text-emerald-400'
-                                                        : 'bg-red-400/10 text-red-400'
-                                                    }`}>
-                                                    {tx.type}
-                                                </span>
-                                            </td>
-                                            <td className="px-5 py-3.5 text-[14px] text-[#9191a0] max-w-xs truncate">
-                                                {tx.note || <span className="text-[#56565f]">—</span>}
-                                            </td>
-                                            <td className={`px-5 py-3.5 text-right font-mono text-[13px] whitespace-nowrap
-                                                ${tx.type === 'sale' ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                {tx.type === 'sale' ? '+' : '-'}{formatNPR(tx.amount)}
-                                            </td>
-                                            <td className="px-5 py-3.5 w-px">
-                                                <button
-                                                    onClick={() => deleteTransaction(tx._id)}
-                                                    aria-label="Delete"
-                                                    className="w-7 h-7 flex items-center justify-center rounded border border-transparent text-[#56565f] opacity-0 group-hover:opacity-100 hover:bg-red-400/10 hover:text-red-400 hover:border-red-400/20 transition-all"
-                                                >
-                                                    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                                                        <path d="M1.5 1.5l8 8M9.5 1.5l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
                         </div>
                     </div>
-
                 </div>
             </div>
+            
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+                
+                .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; }
+                .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #444; }
+            `}</style>
         </div>
-    )
-}
+    );
+};
 
-export default Dashboard
+export default Dashboard;
