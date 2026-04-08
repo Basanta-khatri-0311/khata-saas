@@ -14,14 +14,14 @@ connectDB();
 const app = express();
 
 /* Proper CORS configuration */
-app.use(cors({
-  origin: ["https://khata-bk.netlify.app"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+const corsOptions = {
+  origin: ["https://khata-bk.netlify.app", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-requested-with"],
+  credentials: true,
+};
 
-/* Handle preflight requests */
-app.options(/(.*)/, cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
