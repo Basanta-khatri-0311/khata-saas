@@ -34,19 +34,19 @@ const Login = () => {
     return (
         <div className="min-h-screen bg-black flex items-center justify-center p-6 sm:p-8 font-sans selection:bg-indigo-500/30">
             <div className="w-full max-w-md group">
-                <div className="flex flex-col items-center mb-10 transition-transform duration-500 group-hover:-translate-y-1">
-                    <div className="w-16 h-16 rounded-3xl bg-indigo-600 flex items-center justify-center shadow-[0_0_40px_-5px_rgba(79,70,229,0.3)] border border-white/10 mb-6 group-hover:rotate-6 transition-transform">
-                        <Wallet className="w-8 h-8 text-white" strokeWidth={2.5} />
+                <div className="flex flex-col items-center mb-6 transition-transform duration-500 group-hover:-translate-y-1">
+                    <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-[0_0_40px_-5px_rgba(79,70,229,0.3)] border border-white/10 mb-4 group-hover:rotate-6 transition-transform">
+                        <Wallet className="w-7 h-7 text-white" strokeWidth={2.5} />
                     </div>
                     <h1 className="text-4xl font-black text-white tracking-tighter mb-2">Welcome Back.</h1>
                     <p className="text-zinc-500 font-medium">Log in to manage your digital khata.</p>
                 </div>
 
-                <div className="bg-[#050505] border border-white/5 rounded-[40px] p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+                <div className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 sm:p-8 shadow-2xl relative overflow-hidden">
                     {/* Subtle Gradient Glow */}
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600/10 blur-[100px]" />
 
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
                         {error && (
                             <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-2xl flex items-center gap-3 animate-shake">
                                 <AlertCircle className="w-5 h-5 shrink-0" />
@@ -64,7 +64,7 @@ const Login = () => {
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="name@company.com"
                                     required
-                                    className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-12 text-sm font-medium text-white placeholder:text-zinc-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                    className="w-full h-12 bg-white/[0.03] border border-white/10 rounded-xl px-11 text-sm font-medium text-white placeholder:text-zinc-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all"
                                 />
                             </div>
                         </div>
@@ -79,7 +79,7 @@ const Login = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required
-                                    className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-12 text-sm font-medium text-white placeholder:text-zinc-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                    className="w-full h-12 bg-white/[0.03] border border-white/10 rounded-xl px-11 text-sm font-medium text-white placeholder:text-zinc-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all"
                                 />
                                 <button
                                     type="button"
@@ -94,7 +94,7 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-14 mt-4 bg-white text-black hover:bg-zinc-200 font-bold rounded-2xl transition-all shadow-[0_10px_30px_-10px_rgba(255,255,255,0.2)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-base"
+                            className="w-full h-12 mt-2 bg-white text-black hover:bg-zinc-200 font-bold rounded-xl transition-all shadow-[0_10px_30px_-10px_rgba(255,255,255,0.2)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
                         >
                             {loading ? (
                                 <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
@@ -108,7 +108,7 @@ const Login = () => {
                     </form>
                 </div>
 
-                <p className="text-center mt-8 text-zinc-500 font-medium">
+                <p className="text-center mt-6 text-zinc-500 font-medium text-sm">
                     New to Khata?{' '}
                     <Link to="/register" className="text-white hover:text-indigo-400 transition-colors font-bold underline underline-offset-8 decoration-white/20">
                         Create an account

@@ -20,11 +20,11 @@ const MainLayout = () => {
     }, []);
 
     return (
-        <div className="flex h-screen bg-[#F8FAFC] dark:bg-black text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-500/30 overflow-hidden">
+        <div className="flex h-screen bg-[#F8FAFC] dark:bg-black text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-500/30 overflow-hidden transition-colors duration-300">
             <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
             {/* Main Content */}
-            <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative border-l border-transparent dark:border-white/[0.05]">
+            <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative border-l border-transparent dark:border-white/[0.05] transition-colors duration-300">
                 <Header
                     isSidebarOpen={isSidebarOpen}
                     setIsSidebarOpen={setIsSidebarOpen}
