@@ -70,6 +70,7 @@ As part of our commitment to continuous improvement and maximizing impact, the f
 - **Multi-Branch / Multi-Store Architectures:** Allowing users to segregate their ledgers into independent branches or physical store locations under a single organization.
 - **Voice-Assisted Transactions:** Implementing speech-to-text integration for rapid, hands-free data entry and ledger logging in fast-paced business environments.
 - **Progressive Web App (PWA) & Offline Mode:** Evolving the platform into an installable PWA with local data caching, enabling seamless ledger management even without an active internet connection.
+- **Custom Financial Reports:** Empowering businesses to dynamically generate, customize, and export deeply tailored financial reports based on specific stakeholder requirements.
 
 ## Deployment
 
