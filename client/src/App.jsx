@@ -13,6 +13,8 @@ import AdminRoute from './components/auth/AdminRoute';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import NotFound from './pages/NotFound';
+import Unauthorized from './pages/Unauthorized';
 
 // Interior Operating Pages
 import Dashboard from './pages/Dashboard';
@@ -24,7 +26,7 @@ import PendingApproval from './pages/PendingApproval';
 
 const AppContent = () => {
     const { user, loading } = useAuth();
-    
+
     if (loading) return (
         <div className="min-h-screen bg-black flex items-center justify-center">
             <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
@@ -37,7 +39,8 @@ const AppContent = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+            <Route path="/unauthorized" element={<Unauthorized />} />
+
             {/* SECURED OPERATIONAL SECTOR - Wrapped in pathless protectors to avoid root collisions */}
             <Route element={<ProtectedRoute />}>
                 <Route path="/pending" element={<PendingApproval />} />
@@ -48,7 +51,7 @@ const AppContent = () => {
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/settings" element={<Settings />} />
-                    
+
                     {/* Admin Executive Area */}
                     <Route element={<AdminRoute />}>
                         <Route path="/admin" element={<AdminPanel />} />
@@ -60,7 +63,8 @@ const AppContent = () => {
             </Route>
 
             {/* CATCH-ALL REDIRECTS TO SYSTEM START */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
+
         </Routes>
     );
 }

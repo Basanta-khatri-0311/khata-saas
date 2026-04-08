@@ -4,12 +4,14 @@ import api from '../services/api';
 import { ShieldCheck, User as UserIcon, CheckCircle, XCircle, Trash2, Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
 import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
+import { useNavigate } from 'react-router-dom';
 
 const AdminPanel = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deleteModal, setDeleteModal] = useState({ show: false, userId: null, userName: '' });
     const { searchQuery } = useOutletContext();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchUsers();
@@ -27,6 +29,7 @@ const AdminPanel = () => {
         } catch (err) {
             console.error(err);
             toast.error('Failed to load users');
+             navigate("/unauthorized");
         } finally {
             setLoading(false);
         }
