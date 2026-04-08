@@ -16,7 +16,7 @@ const LandingPage = () => {
 
     return (
         <div className="min-h-screen bg-white dark:bg-[#050505] text-slate-900 dark:text-zinc-100 transition-colors duration-500 font-sans selection:bg-indigo-500/30 overflow-x-hidden">
-            
+
             {/* Minimalist Navigation */}
             <nav className="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 sm:px-16 z-[100] backdrop-blur-md bg-white/80 dark:bg-[#050505]/80 border-b border-slate-100 dark:border-white/[0.05]">
                 <div className="flex items-center gap-2.5">
@@ -27,7 +27,7 @@ const LandingPage = () => {
                 </div>
 
                 <div className="flex items-center gap-8">
-                    <button 
+                    <button
                         onClick={toggleTheme}
                         className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
                     >
@@ -41,10 +41,7 @@ const LandingPage = () => {
             </nav>
 
             {/* Clean Hero System */}
-            <section className="pt-48 pb-32 px-6 sm:px-16 max-w-7xl mx-auto flex flex-col items-start text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500 mb-6 font-mono">
-                    System v2.4.0 — Operational
-                </div>
+            <section className="sm:pt-42 pt-36 pb-32 px-6 sm:px-16 max-w-7xl mx-auto flex flex-col items-start text-left">
 
                 <h1 className="text-6xl sm:text-8xl font-black tracking-tighter leading-[0.85] mb-10 max-w-3xl">
                     Industrial <br /> Financial <br /> Ledger.
@@ -69,13 +66,10 @@ const LandingPage = () => {
             <section className="px-6 sm:px-16 py-24 border-t border-slate-100 dark:border-white/[0.05]">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                        
+
                         {/* Entry 01 */}
                         <div className="space-y-6">
-                            <div className="flex items-center gap-4 text-slate-400">
-                                <span className="text-[10px] font-black font-mono">CORE_001</span>
-                                <div className="h-[1px] flex-1 bg-slate-100 dark:bg-white/10" />
-                            </div>
+
                             <h3 className="text-3xl font-black tracking-tight uppercase">RBAC Protocol</h3>
                             <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed max-w-md">
                                 Industrial Role-Based Access Control. Isolated multitenancy ensures your business data remains strictly confidential and secure under military-grade encryption standards.
@@ -91,10 +85,7 @@ const LandingPage = () => {
 
                         {/* Entry 02 */}
                         <div className="space-y-6">
-                            <div className="flex items-center gap-4 text-slate-400">
-                                <span className="text-[10px] font-black font-mono">LOCL_002</span>
-                                <div className="h-[1px] flex-1 bg-slate-100 dark:bg-white/10" />
-                            </div>
+
                             <h3 className="text-3xl font-black tracking-tight uppercase">B.S. Date Sync</h3>
                             <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed max-w-md">
                                 Native Bikram Sambat integration. Align your financial reports with local tax regulations effortlessly. Sync global ledger entries with the regional B.S. calendar.
@@ -150,12 +141,8 @@ const LandingPage = () => {
 
             {/* Industrial Monochrome Footer */}
             <footer className="py-16 px-6 sm:px-16 border-t border-slate-100 dark:border-white/[0.05] bg-white dark:bg-[#050505]">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 opacity-40">
-                    <div className="flex items-center gap-3 grayscale cursor-default">
-                        <Wallet className="w-5 h-5" strokeWidth={2.5} />
-                        <span className="text-sm font-black tracking-tight uppercase italic">KHATA_SYS</span>
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest">© 2026 Modular Financial Systems. Strictly Confidential.</p>
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 opacity-40">
+                    <p className="text-[10px] font-black uppercase tracking-widest">© {new Date().getFullYear()} Modular Financial Systems. Strictly Confidential.</p>
                 </div>
             </footer>
 
