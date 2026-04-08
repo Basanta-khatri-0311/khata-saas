@@ -1,86 +1,82 @@
-# KHATA — The Industrial Digital Ledger (SaaS-Ready) 🛡️📊💼
+# Khata SaaS
 
-**KHATA** is a high-performance, multi-tenant financial management ecosystem designed for businesses that demand precision, speed, and a premium "Command Center" experience. Built with a sleek **True Black/Industrial aesthetic**, it bridges the gap between traditional bookkeeping and modern SaaS scalability.
+**Live Preview:** [khata-bk.netlify.app](https://khata-bk.netlify.app/)
 
----
+Khata is a modern, responsive financial ledger and business management platform designed for SaaS multi-tenancy. It provides robust tools for administrators to manage user access and for businesses to efficiently track their income, expenses, and financial health.
 
-## 🛠️ The "Command Center" Experience
+## Key Features
 
-KHATA is architected with a dual-mode operative system, providing distinct experiences for the **Master Administrator** and the **General User**.
+- **Role-Based Access Control (RBAC):** Secure separation of concerns between System Administrators and Business Users.
+- **User Management Portal:** Administrators can easily approve, suspend, or manage user registrations.
+- **Financial Dashboard:** Real-time analytics, cash flow tracking, and category distribution visualized through interactive charts.
+- **Full Ledger System:** Comprehensive transaction tracking with advanced time-based filtering and search mechanisms.
+- **Localization:** Integrated with Bikram Sambat (B.S.) date formats tailored for regional financial compliance.
+- **Seamless Theming:** Native responsive UI with a fully interpolated Dark/Light mode toggle for optimal accessibility.
 
-### 🛡️ Master Administrator (SaaS Control)
-*   **Central Registry**: Monitor all operatives (users) from a unified Command Center.
-*   **Clearance Management**: Approve new registrations, suspend accounts, or terminate access in real-time.
-*   **Registry Search**: Rapidly filter through the global user database using the role-aware search header.
-*   **System Integrity**: Complete isolation of business data between different tenants.
+## Technology Stack
 
-### 👤 General User (Financial Ledger)
-*   **Dynamic Dashboard**: Instant visualization of Net Balance, Income, and Expenses with high-impact "Status: Operational" readouts.
-*   **Master Ledger**: A full-archive transaction system with powerful time-based filtering (Week, Month, Year, All-Time).
-*   **BSR-Compliant Localization**: Fully integrated with **Nepali Date (Bikram Sambat)** using `nepali-date-converter` for local financial alignment.
-*   **Analytics Engine**: Interactive charts (Recharts) visualizing cash flow trends and category distribution.
-*   **Adaptive Settings**: Customize business branding and manage custom financial categories.
+**Frontend**
+- React 18
+- React Router DOM v6
+- Context API (State Management)
+- Tailwind CSS (Styling & Design System)
+- Recharts (Data Visualization)
+- Lucide React (Iconography)
 
----
+**Backend**
+- Node.js & Express.js
+- MongoDB & Mongoose
+- JSON Web Tokens (JWT) & bcrypt.js (Authentication & Security)
 
-## 🏗️ Technical Architecture
+## Installation & Setup
 
-### Core Stack
-| Layer | Technologies |
-| :--- | :--- |
-| **Frontend** | React 18, Tailwind CSS, Lucide Icons, Recharts |
-| **Backend** | Node.js, Express.js |
-| **Database** | MongoDB Atlas (Mongoose ODM) |
-| **Security** | JWT (JSON Web Tokens), Bcrypt.js, RBAC Middleware |
-| **State** | React Context API (Auth, Settings, Theme) |
+Ensure you have [Node.js](https://nodejs.org/) (v16+) and [MongoDB](https://www.mongodb.com/) installed on your machine.
 
-### Key Systems
-*   **Liquid Layout**: A fully responsive interface that dynamically adjusts content width based on sidebar state.
-*   **Active-Guardian Middleware**: Server-side verification that blocks data access for "Pending" or "Suspended" users at the routing level.
-*   **Localized Clock**: Real-time Nepali (B.S.) date synchronization across the header and report exports.
-
----
-
-## 🚀 Rapid Deployment
-
-### 1. Environment Configuration (`/server/.env`)
-```env
-PORT=5500
-MONGO_URI=your_mongodb_cluster_uri
-JWT_SECRET=your_industrial_grade_secret
+### 1. Clone the repository
+```bash
+git clone https://github.com/Basanta-khatri-0311/khata-saas.git
+cd khata-saas
 ```
 
-### 2. Backend Ignition
+### 2. Configure Environment Variables
+Create a `.env` file in the `server` directory and add the following keys:
+```env
+PORT=5200
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secure_jwt_secret
+```
+
+### 3. Install Dependencies & Run
+
+**Backend:**
 ```bash
 cd server
 npm install
-node server.js
+npm run dev
 ```
 
-### 3. Frontend Launch
+**Frontend:**
 ```bash
 cd client
 npm install
 npm run dev
 ```
 
----
+## Development Roadmap
 
-## 💎 Design Philosophy
-KHATA adheres to a **Minimalist Industrial** aesthetic. 
-*   **Rounded-3xl Geometry**: Fluid, modern container shapes.
-*   **High-Contrast Typography**: Heavy font weights (`font-black`) for critical data readouts.
-*   **Functional Micro-animations**: Subtle hover effects and toast notifications (React Hot Toast) for sensory feedback.
-*   **Bespoke Dark Mode**: A "True Black" theme designed to reduce eye strain in high-intensity financial environments.
+As part of our commitment to continuous improvement and maximizing impact, the following features are actively being explored for upcoming releases:
 
----
+- **Automated Email Workflows:** Trigger secure, automatic email notifications when a pending user registration is approved or rejected by an Administrator.
+- **Multi-Branch / Multi-Store Architectures:** Allowing users to segregate their ledgers into independent branches or physical store locations under a single organization.
+- **Voice-Assisted Transactions:** Implementing speech-to-text integration for rapid, hands-free data entry and ledger logging in fast-paced business environments.
+- **Progressive Web App (PWA) & Offline Mode:** Evolving the platform into an installable PWA with local data caching, enabling seamless ledger management even without an active internet connection.
 
-## 📜 Master Admin Setup
-To claim the **Master Admin** vacancy on a fresh deployment:
-1.  Use a client like Postman or the web Registry to sign up.
-2.  The first user to register with `role: "admin"` in the payload will be automatically granted Master Admin clearance and activated.
-3.  All subsequent registrations will be defaulted to `User` / `Pending` status.
+## Deployment
 
----
+Khata is optimized for modern PaaS platforms.
+- **Frontend:** Pre-configured for Netlify or Vercel (includes `_redirects` for SPA routing).
+- **Backend:** Ready for deployment on Render, Heroku, or DigitalOcean instances.
 
-**Developed for the next generation of financial operatives.** 🚀💎🛡️
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
