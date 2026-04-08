@@ -37,10 +37,10 @@ export const SettingsProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        if (user) {
+        if (user && user.status === 'active') {
             fetchSettings();
         } else {
-            // Reset to defaults on logout
+            // Reset to defaults on logout or if user is pending
             setSettings({
                 businessName: 'Khata',
                 businessSubtitle: 'खाता प्रणाली',
