@@ -89,11 +89,17 @@ const Reports = () => {
     const INC_COLORS = ['#10b981', '#059669', '#34d399', '#064e3b', '#6ee7b7'];
     const EXP_COLORS = ['#f43f5e', '#e11d48', '#fb7185', '#9f1239', '#fda4af'];
 
+    if (loading) return (
+        <div className="flex items-center justify-center h-[calc(100vh-200px)] animate-pulse">
+            <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
+        </div>
+    );
+
     return (
-        <div className="flex flex-col gap-8 pb-10 max-w-full font-sans">
+        <div className="flex flex-col gap-8 pb-10 max-w-full font-sans overflow-hidden">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Analytics</h1>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">Analytics</h1>
                     <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Monitor your financial performance metrics.</p>
                 </div>
 
@@ -114,10 +120,10 @@ const Reports = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-20 min-w-0">
                 
                 {/* Historical Monthly Bar Chart */}
-                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 sm:p-8 h-[450px]">
+                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 sm:p-8 h-[450px] min-w-0 overflow-hidden">
                     <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-8 uppercase tracking-widest">Cash Flow Trend</h3>
                     <ResponsiveContainer width="100%" height="80%">
                         <BarChart data={dataBar}>
@@ -134,7 +140,7 @@ const Reports = () => {
 
 
                 {/* Income Categories */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col">
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col min-w-0 overflow-hidden">
                     <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-4 uppercase tracking-widest">Income Breakdown</h3>
                     <div className="flex-1 flex justify-center items-center">
                         {dataIncomePie.length > 0 ? (
@@ -152,7 +158,7 @@ const Reports = () => {
                 </div>
 
                 {/* Expense Categories */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col">
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col min-w-0 overflow-hidden">
                     <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-4 uppercase tracking-widest">Expense Distribution</h3>
                     <div className="flex-1 flex justify-center items-center">
                         {dataExpensePie.length > 0 ? (
