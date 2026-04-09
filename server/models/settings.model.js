@@ -6,7 +6,8 @@ const settingsSchema = new mongoose.Schema({
     businessPhone: { type: String, default: "" },
     businessSubtitle: { type: String, default: "खाता प्रणाली" },
     incomeCategories: { type: [String], default: ["General Income", "Sales", "Services"] },
-    expenseCategories: { type: [String], default: ["General Expense", "Rent", "Khaja", "Salary", "Internet"] }
+    expenseCategories: { type: [String], default: ["General Expense", "Rent", "Khaja", "Salary", "Internet"] },
+    language: { type: String, default: "ne", enum: ["en", "ne"] }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Settings", settingsSchema);
