@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReceiptText, Calendar, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
+import { ReceiptText, Calendar, TrendingUp, TrendingDown, Trash2, User as UserIcon } from 'lucide-react';
 import NepaliDate from 'nepali-date-converter';
 
 const formatNPR = (val) =>
@@ -94,10 +94,17 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                                 <span className="text-[13px] sm:text-sm font-bold text-slate-900 dark:text-white truncate">
-                                                    {tx.note || (isSale ? 'General Receipt' : 'General Payment')}
+                                                    {(tx.type === 'udharo_sale' || tx.type === 'udharo_payment') && tx.customerName ? (
+                                                        <span className="flex items-center gap-1.5">
+                                                            <UserIcon className="w-3.5 h-3.5 text-indigo-500" />
+                                                            {tx.customerName}
+                                                        </span>
+                                                    ) : (
+                                                        tx.note || (isSale ? 'General Receipt' : 'General Payment')
+                                                    )}
                                                 </span>
-                                                <span className={`text-[11px] sm:text-xs font-semibold mt-0.5 ${isSale ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                                                    {tx.category || (isSale ? 'Income' : 'Expense')}
+                                                <span className={`text-[11px] sm:text-xs font-semibold mt-0.5 ${tx.type === 'udharo_sale' ? 'text-amber-500' : tx.type === 'udharo_payment' ? 'text-cyan-500' : isSale ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                                    {tx.type === 'udharo_sale' ? 'Udharo (Owed)' : tx.type === 'udharo_payment' ? 'Udharo Settlement' : tx.category || (isSale ? 'Income' : 'Expense')}
                                                 </span>
                                             </div>
                                         </div>

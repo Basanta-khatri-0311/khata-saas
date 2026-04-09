@@ -23,8 +23,10 @@ const Dashboard = () => {
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('sale');
     const [category, setCategory] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [note, setNote] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
     
     // App State
     const [loading, setLoading] = useState(true);
@@ -89,7 +91,7 @@ const Dashboard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const payload = { amount, type, category, note, createdAt: date };
+            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone };
             
             let handledOffline = false;
             const saveOffline = async () => {
@@ -138,11 +140,16 @@ const Dashboard = () => {
                 setSummary(prev => {
                     const numAmount = Number(payload.amount);
                     const isSale = payload.type === 'sale';
+                    const isUdharo = payload.type === 'udharo_sale';
+                    
                     const newSales = isSale ? prev.totalSales + numAmount : prev.totalSales;
-                    const newExpenses = !isSale ? prev.totalExpenses + numAmount : prev.totalExpenses;
+                    const newExpenses = (payload.type === 'expense') ? prev.totalExpenses + numAmount : prev.totalExpenses;
+                    const newUdharo = isUdharo ? (prev.totalUdharo || 0) + numAmount : (prev.totalUdharo || 0);
+
                     return {
                         totalSales: newSales,
                         totalExpenses: newExpenses,
+                        totalUdharo: newUdharo,
                         profit: newSales - newExpenses
                     };
                 });
@@ -151,7 +158,8 @@ const Dashboard = () => {
             }
             setIsModalOpen(false);
         } catch (err) { 
-            toast.error('Failed to save changes. Please try again.');
+            console.error('SAVE FAILURE:', err); 
+            toast.error(err?.response?.data?.error || 'Failed to save changes. Please try again.');
         }
         finally { setSubmitting(false); }
     };
@@ -173,12 +181,22 @@ const Dashboard = () => {
         }
     };
 
+    const debtors = Object.values(transactions.reduce((acc, tx) => {
+        if (!tx.customerName) return acc;
+        if (!acc[tx.customerName]) acc[tx.customerName] = { name: tx.customerName, balance: 0, phone: tx.customerPhone || '' };
+        if (tx.type === 'udharo_sale') acc[tx.customerName].balance += tx.amount;
+        else if (tx.type === 'udharo_payment') acc[tx.customerName].balance -= tx.amount;
+        return acc;
+    }, {})).filter(d => d.balance > 0);
+
     const resetForm = () => {
         setAmount('');
         setNote('');
         setCategory('');
         setDate(new Date().toISOString().split('T')[0]);
         setType('sale');
+        setCustomerName('');
+        setCustomerPhone('');
         setEditingTransaction(null);
     };
 
@@ -189,6 +207,8 @@ const Dashboard = () => {
         setCategory(tx.category);
         setDate(tx.createdAt ? new Date(tx.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
         setNote(tx.note);
+        setCustomerName(tx.customerName || '');
+        setCustomerPhone(tx.customerPhone || '');
         setIsModalOpen(true);
     };
 
@@ -267,6 +287,11 @@ const Dashboard = () => {
                 setCategory={setCategory}
                 date={date}
                 setDate={setDate}
+                customerName={customerName}
+                setCustomerName={setCustomerName}
+                customerPhone={customerPhone}
+                setCustomerPhone={setCustomerPhone}
+                debtors={debtors}
                 isEditing={!!editingTransaction}
             />
 

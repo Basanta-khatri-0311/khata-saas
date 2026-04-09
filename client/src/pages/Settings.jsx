@@ -9,6 +9,7 @@ const Settings = () => {
     const [formData, setFormData] = useState({
         businessName: '',
         businessSubtitle: '',
+        businessPhone: '',
         incomeCategories: [],
         expenseCategories: []
     });
@@ -30,6 +31,7 @@ const Settings = () => {
             setFormData({
                 businessName: settings.businessName || '',
                 businessSubtitle: settings.businessSubtitle || '',
+                businessPhone: settings.businessPhone || '',
                 incomeCategories: settings.incomeCategories || [],
                 expenseCategories: settings.expenseCategories || []
             });
@@ -116,6 +118,16 @@ const Settings = () => {
                             type="text" 
                             value={formData.businessSubtitle}
                             onChange={(e) => setFormData({...formData, businessSubtitle: e.target.value})}
+                            className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-indigo-500/50 outline-none text-slate-900 dark:text-white"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-black text-slate-400 dark:text-gray-600 uppercase tracking-widest">Business WhatsApp (Notice Sender)</label>
+                        <input 
+                            type="tel" 
+                            value={formData.businessPhone}
+                            placeholder="e.g. 9800000000"
+                            onChange={(e) => setFormData({...formData, businessPhone: e.target.value})}
                             className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-indigo-500/50 outline-none text-slate-900 dark:text-white"
                         />
                     </div>

@@ -24,6 +24,7 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import AdminPanel from './pages/AdminPanel';
 import PendingApproval from './pages/PendingApproval';
+import Udharo from './pages/Udharo';
 
 const AppContent = () => {
     const { user, loading } = useAuth();
@@ -79,6 +80,7 @@ const AppContent = () => {
                 <Route element={<MainLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/udharo" element={<Udharo />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/settings" element={<Settings />} />
 

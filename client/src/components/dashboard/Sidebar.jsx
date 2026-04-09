@@ -12,6 +12,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     const businessItems = [
         { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { label: 'Transactions', path: '/transactions', icon: ReceiptText },
+        { label: 'Udharo', path: '/udharo', icon: Wallet },
         { label: 'Reports', path: '/reports', icon: PieChart },
         { label: 'Settings', path: '/settings', icon: SettingsIcon },
     ];

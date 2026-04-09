@@ -17,6 +17,11 @@ const TransactionModal = ({
     setCategory, 
     date, 
     setDate,
+    customerName,
+    setCustomerName,
+    customerPhone,
+    setCustomerPhone,
+    debtors = [],
     isEditing = false
 }) => {
     if (!isOpen) return null;
@@ -64,6 +69,11 @@ const TransactionModal = ({
                         setCategory={setCategory}
                         date={date}
                         setDate={setDate}
+                        customerName={customerName}
+                        setCustomerName={setCustomerName}
+                        customerPhone={customerPhone}
+                        setCustomerPhone={setCustomerPhone}
+                        debtors={debtors}
                         isModal={true}
                     />
                 </div>
