@@ -48,6 +48,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
     const menuItems = isAdmin ? adminItems : businessItems;
 
+    const handleLinkClick = () => {
+        if (window.innerWidth < 768) {
+            setIsOpen(false);
+        }
+    };
+
     return (
         <>
             {/* Mobile backdrop */}
@@ -99,12 +105,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     </button>
                 </div>
 
-                <nav className="flex flex-col gap-2 flex-1 mt-8">
-                    {isOpen && <div className="text-[11px] font-semibold text-slate-400 dark:text-gray-600 uppercase tracking-wider mb-2 px-3 whitespace-nowrap transition-opacity">{t.menu}</div>}
+                <nav className="flex flex-col gap-2 flex-1 mt-8 overflow-y-auto custom-scrollbar">
+                    {isOpen && <div className="text-[11px] font-bold text-slate-400 dark:text-gray-600 uppercase tracking-widest mb-2 px-3 whitespace-nowrap transition-opacity">{t.menu}</div>}
                     {menuItems.map(({ label, path, icon: Icon }) => (
                         <NavLink
                             key={label}
                             to={path}
+                            onClick={handleLinkClick}
                             className={({ isActive }) => `flex items-center ${isOpen ? 'gap-3 px-3' : 'justify-center px-0'} py-3 rounded-xl transition-all duration-200 group
                                 ${isActive
                                     ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400'
@@ -115,7 +122,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                             {({ isActive }) => (
                                 <>
                                     <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-gray-500 group-hover:text-slate-600 dark:group-hover:text-gray-400'} transition-colors`} strokeWidth={isOpen ? 2 : 2.5} />
-                                    {isOpen && <span className="text-[14px] font-medium whitespace-nowrap overflow-hidden">{label}</span>}
+                                    {isOpen && <span className="text-[14px] font-bold uppercase tracking-tight whitespace-nowrap overflow-hidden">{label}</span>}
                                 </>
                             )}
                         </NavLink>
@@ -125,12 +132,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 {/* Logout Button */}
                 <div className="pt-6 mt-6 border-t border-slate-100 dark:border-white/5 font-sans">
                     <button
-                        onClick={logout}
+                        onClick={() => {
+                            logout();
+                            handleLinkClick();
+                        }}
                         className={`flex items-center ${isOpen ? 'gap-3 px-3 w-full' : 'justify-center'} py-3 rounded-xl transition-all duration-200 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold group`}
                         title={!isOpen ? t.logout : ''}
                     >
                         <LogOut className="w-5 h-5 shrink-0" strokeWidth={2.5} />
-                        {isOpen && <span className="text-[14px]">{t.logout}</span>}
+                        {isOpen && <span className="text-[14px] uppercase tracking-wider">{t.logout}</span>}
                     </button>
                 </div>
             </aside>
