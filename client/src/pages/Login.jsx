@@ -32,21 +32,22 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#050505] flex items-center justify-center p-6 sm:p-8 font-sans selection:bg-indigo-500/30 transition-colors duration-500">
-            <div className="w-full max-w-md group">
-                <div className="flex flex-col items-center mb-6 transition-transform duration-500 group-hover:-translate-y-1">
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-[0_0_40px_-5px_rgba(79,70,229,0.3)] border border-white/10 mb-4 group-hover:rotate-6 transition-transform">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#050505] flex items-center justify-center p-6 sm:p-8 font-sans selection:bg-indigo-500/30 transition-colors duration-500 relative overflow-hidden">
+            {/* Background Grid Elements */}
+            <div className="absolute inset-0 grid-bg pointer-events-none z-0" />
+            <div className="absolute inset-0 noise pointer-events-none z-0" />
+
+            <div className="w-full max-w-md group relative z-10">
+                <div className="flex flex-col items-center mb-10">
+                    <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-2xl shadow-indigo-600/20 mb-6">
                         <Wallet className="w-7 h-7 text-white" strokeWidth={2.5} />
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-2">Welcome Back.</h1>
-                    <p className="text-slate-500 dark:text-zinc-500 font-medium">Log in to manage your digital khata.</p>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-2 uppercase italic">Login</h1>
+                    <p className="text-slate-500 dark:text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Access yours business dashboard</p>
                 </div>
 
-                <div className="bg-white dark:bg-[#050505] border border-slate-200 dark:border-white/5 rounded-[2rem] p-6 sm:p-8 shadow-2xl relative overflow-hidden transition-colors">
-                    {/* Subtle Gradient Glow */}
-                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600/10 blur-[100px]" />
-
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
+                <div className="bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-[2.5rem] p-8 sm:p-10 shadow-2xl shadow-black/5">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                         {error && (
                             <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-2xl flex items-center gap-3 animate-shake">
                                 <AlertCircle className="w-5 h-5 shrink-0" />
@@ -54,37 +55,37 @@ const Login = () => {
                             </div>
                         )}
 
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest ml-1">Email Address</label>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em] ml-1">Email Address</label>
                             <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-zinc-600 transition-colors group-focus-within:text-indigo-400" />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-zinc-700 transition-colors" />
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="name@company.com"
+                                    placeholder="yourname@gmail.com"
                                     required
-                                    className="w-full h-12 bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl px-11 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-zinc-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all font-sans"
+                                    className="w-full h-14 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 rounded-2xl px-12 text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-zinc-800 outline-none focus:border-indigo-500/50 transition-all font-sans"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest ml-1">Secure Password</label>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em] ml-1">Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-zinc-600" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-zinc-700" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required
-                                    className="w-full h-12 bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl px-11 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-zinc-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all font-sans"
+                                    className="w-full h-14 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 rounded-2xl px-12 text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-zinc-800 outline-none focus:border-indigo-500/50 transition-all font-sans"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(prev => !prev)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-600 hover:text-slate-900 dark:hover:text-zinc-400 transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-700 hover:text-indigo-500 transition-colors"
                                 >
                                     {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                 </button>
@@ -94,37 +95,27 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-12 mt-2 bg-black dark:bg-white text-white dark:text-black hover:opacity-90 font-bold rounded-xl transition-all shadow-[0_10px_30px_-10px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_30px_-10px_rgba(255,255,255,0.1)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+                            className="group relative w-full h-14 mt-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] rounded-2xl overflow-hidden transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-xs shadow-xl shadow-black/5"
                         >
                             {loading ? (
                                 <span className="w-5 h-5 border-2 border-white/20 border-t-white dark:border-black/20 dark:border-t-black rounded-full animate-spin" />
                             ) : (
                                 <>
-                                    <LogIn className="w-5 h-5" />
-                                    Login
+                                    <span>Login</span>
+                                    <LogIn className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                                 </>
                             )}
                         </button>
                     </form>
                 </div>
 
-                <p className="text-center mt-6 text-slate-500 dark:text-zinc-500 font-medium text-sm">
+                <p className="text-center mt-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-500">
                     New to Khata?{' '}
-                    <Link to="/register" className="text-slate-900 dark:text-white hover:text-indigo-400 transition-colors font-bold underline underline-offset-8 decoration-slate-900/20 dark:decoration-white/20">
-                        Create an account
+                    <Link to="/register" className="text-indigo-600 dark:text-white hover:underline underline-offset-8">
+                        Create Account
                     </Link>
                 </p>
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    25% { transform: translateX(-4px); }
-                    75% { transform: translateX(4px); }
-                }
-                .animate-shake { animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both; }
-            `}} />
         </div>
     );
 };

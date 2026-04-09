@@ -52,6 +52,28 @@ html {
 }
 
 /* Custom Animations for Landing Page */
+/* Global Grid and Noise System */
+:root {
+  --grid-color: rgba(0, 0, 0, 0.03);
+}
+
+.dark {
+  --grid-color: rgba(255, 255, 255, 0.03);
+}
+
+.grid-bg {
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -86,6 +108,16 @@ html {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 /* Mapping Tailwind-style 'animate-in' to our keyframes */

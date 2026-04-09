@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell, Legend } from 'recharts';
 import { format } from 'date-fns';
+import { PieChart as PieChartIcon } from 'lucide-react';
 
 const Reports = () => {
     const [transactions, setTransactions] = useState([]);
@@ -37,8 +38,12 @@ const Reports = () => {
     });
 
     // Calculate Comparison Pie (Overall Income vs Expense)
-    const totalSales = filteredTransactions.filter(t => t.type === 'sale').reduce((a, b) => a + Number(b.amount), 0);
-    const totalExpenses = filteredTransactions.filter(t => t.type === 'expense').reduce((a, b) => a + Number(b.amount), 0);
+    const totalSales = filteredTransactions
+        .filter(t => t.type === 'sale' || t.type === 'udharo_sale' || t.type === 'udharo_payment')
+        .reduce((a, b) => a + Number(b.amount), 0);
+    const totalExpenses = filteredTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((a, b) => a + Number(b.amount), 0);
 
     const dataPie = [
         { name: 'Income', value: totalSales },
@@ -58,9 +63,9 @@ const Reports = () => {
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value);
 
-    // Calculate Category Breakdown for Income Pie Chart
+    // Calculate Category Breakdown for Income Pie Chart (Including udharo_sale and udharo_payment)
     const incomeCategories = filteredTransactions
-        .filter(t => t.type === 'sale')
+        .filter(t => t.type === 'sale' || t.type === 'udharo_sale' || t.type === 'udharo_payment')
         .reduce((acc, tx) => {
             const cat = tx.category || 'General';
             acc[cat] = (acc[cat] || 0) + Number(tx.amount);
@@ -79,7 +84,7 @@ const Reports = () => {
 
         if (!acc[key]) acc[key] = { name: nameLabel, Income: 0, Expenses: 0, timestamp: new Date(d.getFullYear(), timeFilter === 'ALL' ? 0 : d.getMonth(), 1).getTime() };
         
-        if (tx.type === 'sale') acc[key].Income += Number(tx.amount);
+        if (tx.type === 'sale' || tx.type === 'udharo_sale' || tx.type === 'udharo_payment') acc[key].Income += Number(tx.amount);
         if (tx.type === 'expense') acc[key].Expenses += Number(tx.amount);
         return acc;
     }, {});
@@ -96,7 +101,7 @@ const Reports = () => {
     );
 
     return (
-        <div className="flex flex-col gap-8 pb-10 max-w-full font-sans overflow-hidden">
+        <div className="flex flex-col gap-8 pb-32 font-sans">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">Analytics</h1>
@@ -120,58 +125,95 @@ const Reports = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-20 min-w-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pb-20">
                 
-                {/* Historical Monthly Bar Chart */}
-                <div className="md:col-span-2 lg:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-6 sm:p-8 h-[450px] min-w-0 overflow-hidden">
-                    <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-8 uppercase tracking-widest">Cash Flow Trend</h3>
+                {/* Historical Monthly Bar Chart - TOP FULL WIDTH */}
+                <div className="md:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-[2rem] shadow-xl shadow-black/5 border border-slate-200 dark:border-white/[0.05] p-10 h-[500px] min-w-0 overflow-hidden">
+                    <h3 className="text-sm font-black text-slate-400 border-l-4 border-slate-400 pl-4 mb-10 uppercase tracking-widest">Fiscal Growth Trend</h3>
                     <ResponsiveContainer width="100%" height="80%">
                         <BarChart data={dataBar}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} opacity={0.15} />
-                            <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 10, fontWeight: 700}} axisLine={false} tickLine={false} />
-                            <YAxis tick={{fill: '#6b7280', fontSize: 10, fontWeight: 700}} axisLine={false} tickLine={false} tickFormatter={(v) => `Rs ${v}`} />
-                            <Tooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '12px'}} />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.05} />
+                            <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 10, fontWeight: 900}} axisLine={false} tickLine={false} />
+                            <YAxis tick={{fill: '#6b7280', fontSize: 10, fontWeight: 900}} axisLine={false} tickLine={false} tickFormatter={(v) => `Rs ${v}`} />
+                            <Tooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} contentStyle={{backgroundColor: '#0a0a0a', border: 'none', borderRadius: '16px', fontSize: '12px'}} />
                             <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px'}} />
-                            <Bar dataKey="Income" fill="#6366f1" radius={[6, 6, 0, 0]} maxBarSize={32} />
-                            <Bar dataKey="Expenses" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={32} />
+                            <Bar dataKey="Income" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                            <Bar dataKey="Expenses" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={40} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
 
-
                 {/* Income Categories */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col min-w-0 overflow-hidden">
-                    <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-4 uppercase tracking-widest">Income Breakdown</h3>
-                    <div className="flex-1 flex justify-center items-center">
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-[2rem] shadow-xl shadow-black/5 border border-slate-200 dark:border-white/[0.05] p-6 h-[500px] flex flex-col min-w-0">
+                    <h3 className="text-sm font-black text-indigo-500 border-l-4 border-indigo-500 pl-4 mb-6 uppercase tracking-widest">Income Breakdown</h3>
+                    <div className="flex-1 w-full h-full min-h-0 flex justify-center items-center">
                         {dataIncomePie.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={dataIncomePie} innerRadius={80} outerRadius={120} paddingAngle={4} dataKey="value" stroke="none">
+                            <ResponsiveContainer width="100%" height="100%" debounce={1}>
+                                <RePieChart>
+                                    <Pie 
+                                        data={dataIncomePie} 
+                                        innerRadius={60} 
+                                        outerRadius={85} 
+                                        paddingAngle={5} 
+                                        dataKey="value" 
+                                        stroke="none"
+                                        label={({ name }) => name.length > 12 ? `${name.substring(0, 10)}...` : name}
+                                    >
                                         {dataIncomePie.map((_, i) => <Cell key={i} fill={INC_COLORS[i % INC_COLORS.length]} />)}
                                     </Pie>
-                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff'}} />
-                                    <Legend iconType="circle" wrapperStyle={{fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px'}} />
-                                </PieChart>
+                                    <Tooltip 
+                                        contentStyle={{backgroundColor: '#0a0a0a', border: 'none', borderRadius: '16px', color: '#fff'}}
+                                        itemStyle={{ color: '#fff' }}
+                                    />
+                                    <Legend 
+                                        iconType="circle" 
+                                        wrapperStyle={{fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', paddingTop: '10px'}} 
+                                    />
+                                </RePieChart>
                             </ResponsiveContainer>
-                        ) : <span className="text-sm font-black text-slate-400 uppercase tracking-widest">No income recorded</span>}
+                        ) : (
+                            <div className="flex flex-col items-center gap-4 opacity-20">
+                                <PieChartIcon className="w-12 h-12" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">No income data</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Expense Categories */}
-                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-8 h-[450px] flex flex-col min-w-0 overflow-hidden">
-                    <h3 className="text-sm font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5 pb-4 mb-4 uppercase tracking-widest">Expense Distribution</h3>
-                    <div className="flex-1 flex justify-center items-center">
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-[2rem] shadow-xl shadow-black/5 border border-slate-200 dark:border-white/[0.05] p-6 h-[500px] flex flex-col min-w-0">
+                    <h3 className="text-sm font-black text-rose-500 border-l-4 border-rose-500 pl-4 mb-6 uppercase tracking-widest">Expense Distribution</h3>
+                    <div className="flex-1 w-full h-full min-h-0 flex justify-center items-center">
                         {dataExpensePie.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={dataExpensePie} innerRadius={80} outerRadius={120} paddingAngle={4} dataKey="value" stroke="none">
+                            <ResponsiveContainer width="100%" height="100%" debounce={1}>
+                                <RePieChart>
+                                    <Pie 
+                                        data={dataExpensePie} 
+                                        innerRadius={60} 
+                                        outerRadius={85} 
+                                        paddingAngle={5} 
+                                        dataKey="value" 
+                                        stroke="none"
+                                        label={({ name }) => name.length > 12 ? `${name.substring(0, 10)}...` : name}
+                                    >
                                         {dataExpensePie.map((_, i) => <Cell key={i} fill={EXP_COLORS[i % EXP_COLORS.length]} />)}
                                     </Pie>
-                                    <Tooltip contentStyle={{backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff'}} />
-                                    <Legend iconType="circle" wrapperStyle={{fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px'}} />
-                                </PieChart>
+                                    <Tooltip 
+                                        contentStyle={{backgroundColor: '#0a0a0a', border: 'none', borderRadius: '16px', color: '#fff'}}
+                                        itemStyle={{ color: '#fff' }}
+                                    />
+                                    <Legend 
+                                        iconType="circle" 
+                                        wrapperStyle={{fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', paddingTop: '10px'}} 
+                                    />
+                                </RePieChart>
                             </ResponsiveContainer>
-                        ) : <span className="text-sm font-black text-slate-400 uppercase tracking-widest">No expenses recorded</span>}
+                        ) : (
+                            <div className="flex flex-col items-center gap-4 opacity-20">
+                                <PieChartIcon className="w-12 h-12" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">No expense data</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
