@@ -7,6 +7,7 @@ import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
 import api from '../services/api';
 import { Plus, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { addTransactionToSync, getTransactionsToSync } from '../services/db';
 
 const Dashboard = () => {
     const { searchQuery } = useOutletContext();
@@ -36,6 +37,15 @@ const Dashboard = () => {
             setLoading(false);
         };
         loadInitialData();
+
+        const handleSyncUpdate = () => {
+            fetchSummary();
+            fetchTransactions();
+            toast.success('Offline transactions synced successfully!');
+        };
+        window.addEventListener('transactions-updated', handleSyncUpdate);
+
+        return () => window.removeEventListener('transactions-updated', handleSyncUpdate);
     }, []);
 
     const fetchSummary = async () => {
@@ -47,8 +57,31 @@ const Dashboard = () => {
 
     const fetchTransactions = async () => {
         try {
-            const res = await api.get('/transactions');
-            setTransactions(res.data);
+            let serverData = await new Promise(resolve => {
+                setTransactions(prev => { resolve(prev.filter(t => !t.isOffline)); return prev; });
+            });
+
+            if (navigator.onLine) {
+                try {
+                    const res = await api.get('/transactions');
+                    serverData = res.data;
+                } catch (err) {
+                    console.error('Failed to fetch from server', err);
+                }
+            }
+
+            try {
+                const offlineTxs = await getTransactionsToSync();
+                const formattedOffline = offlineTxs.map(tx => ({
+                    ...tx,
+                    _id: `offline-${tx.id}`,
+                    isOffline: true
+                }));
+                setTransactions([...formattedOffline, ...serverData]);
+            } catch (err) {
+                console.error("Failed to load offline txs", err);
+                setTransactions(serverData);
+            }
         } catch (err) { console.error(err); }
     };
 
@@ -58,20 +91,67 @@ const Dashboard = () => {
         try {
             const payload = { amount, type, category, note, createdAt: date };
             
-            if (editingTransaction) {
-                await api.put(`/transactions/${editingTransaction._id}`, payload);
-                toast.success('Transaction Updated ✨');
+            let handledOffline = false;
+            const saveOffline = async () => {
+                if (editingTransaction) {
+                    toast.error('Cannot edit transactions while offline');
+                    throw new Error("Cannot edit offline");
+                } else {
+                    try {
+                        const tempId = `temp-${Date.now()}`;
+                        await addTransactionToSync(payload);
+                        toast.success('Saved Offline. Will sync when connected 📶');
+                        handledOffline = true;
+                        setTransactions(prev => [{ ...payload, _id: tempId, isOffline: true }, ...prev]);
+                    } catch (dbErr) {
+                        console.error('IndexedDB Error:', dbErr);
+                        toast.error('Offline storage failed');
+                        throw dbErr;
+                    }
+                }
+            };
+
+            if (!navigator.onLine) {
+                await saveOffline();
             } else {
-                await api.post('/transactions', payload);
-                toast.success('Transaction Recorded 🚀');
+                try {
+                    if (editingTransaction) {
+                        await api.put(`/transactions/${editingTransaction._id}`, payload);
+                        toast.success('Transaction Updated ✨');
+                    } else {
+                        await api.post('/transactions', payload);
+                        toast.success('Transaction Recorded 🚀');
+                    }
+                } catch (netErr) {
+                    const isNetworkFailure = !netErr.response || netErr.code === 'ERR_NETWORK' || netErr.message.includes('Network Error') || netErr.message.includes('timeout');
+                    if (isNetworkFailure) {
+                        await saveOffline();
+                    } else {
+                        throw netErr;
+                    }
+                }
             }
 
             resetForm();
-            await Promise.all([fetchSummary(), fetchTransactions()]);
+            if (handledOffline) {
+                // Optimistically update summary state
+                setSummary(prev => {
+                    const numAmount = Number(payload.amount);
+                    const isSale = payload.type === 'sale';
+                    const newSales = isSale ? prev.totalSales + numAmount : prev.totalSales;
+                    const newExpenses = !isSale ? prev.totalExpenses + numAmount : prev.totalExpenses;
+                    return {
+                        totalSales: newSales,
+                        totalExpenses: newExpenses,
+                        profit: newSales - newExpenses
+                    };
+                });
+            } else {
+                await Promise.all([fetchSummary(), fetchTransactions()]);
+            }
             setIsModalOpen(false);
         } catch (err) { 
-            console.error(err); 
-            toast.error(err.response?.data?.error || 'Failed to save');
+            toast.error('Failed to save changes. Please try again.');
         }
         finally { setSubmitting(false); }
     };

@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { SettingsProvider } from './context/SettingsContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
-
+import { getTransactionsToSync, clearSyncTransaction } from './services/db';
+import api from './services/api';
 // Core Shell & Components
 import MainLayout from './components/layout/MainLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -26,6 +27,35 @@ import PendingApproval from './pages/PendingApproval';
 
 const AppContent = () => {
     const { user, loading } = useAuth();
+
+    React.useEffect(() => {
+        const handleSync = async () => {
+            if (!navigator.onLine) return;
+            try {
+                const offlineTxs = await getTransactionsToSync();
+                if (offlineTxs.length > 0) {
+                    for (const tx of offlineTxs) {
+                        try {
+                            const { id, timestamp, ...payload } = tx;
+                            await api.post('/transactions', payload);
+                            await clearSyncTransaction(id);
+                        } catch (err) {
+                            console.error('Failed to sync transaction', tx, err);
+                        }
+                    }
+                    window.dispatchEvent(new Event('transactions-updated'));
+                }
+            } catch (err) {
+                console.error('Error during sync check:', err);
+            }
+        };
+
+        window.addEventListener('online', handleSync);
+        // Also try taking a look on mount just in case
+        handleSync();
+
+        return () => window.removeEventListener('online', handleSync);
+    }, []);
 
     if (loading) return (
         <div className="min-h-screen bg-black flex items-center justify-center">

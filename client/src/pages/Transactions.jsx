@@ -7,7 +7,7 @@ import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
 import { isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import { Download } from 'lucide-react';
 import toast from 'react-hot-toast';
-
+import { addTransactionToSync, getTransactionsToSync } from '../services/db';
 const Transactions = () => {
     const { searchQuery } = useOutletContext();
     const [transactions, setTransactions] = useState([]);
@@ -30,14 +30,47 @@ const Transactions = () => {
 
     useEffect(() => {
         fetchTransactions();
+
+        const handleSyncUpdate = () => {
+            fetchTransactions();
+            toast.success('Offline transactions synced successfully!');
+        };
+        window.addEventListener('transactions-updated', handleSyncUpdate);
+
+        return () => window.removeEventListener('transactions-updated', handleSyncUpdate);
     }, []);
 
     const fetchTransactions = async () => {
         try {
-            const res = await api.get('/transactions');
-            setTransactions(res.data);
-        } catch (err) { console.error(err); }
-        finally { setLoading(false); }
+            let serverData = await new Promise(resolve => {
+                setTransactions(prev => { resolve(prev.filter(t => !t.isOffline)); return prev; });
+            }); // Get current non-offline data as a fallback
+
+            if (navigator.onLine) {
+                try {
+                    const res = await api.get('/transactions');
+                    serverData = res.data;
+                } catch (err) {
+                    console.error('Failed to fetch from server', err);
+                }
+            }
+            
+            // Also load any pending offline transactions
+            try {
+                const offlineTxs = await getTransactionsToSync();
+                const formattedOffline = offlineTxs.map(tx => ({
+                    ...tx,
+                    _id: `offline-${tx.id}`,
+                    isOffline: true
+                }));
+                setTransactions([...formattedOffline, ...serverData]);
+            } catch (err) {
+                console.error("Failed to load offline txs", err);
+                setTransactions(serverData);
+            }
+        } finally { 
+            setLoading(false); 
+        }
     };
 
     const handleSave = async (e) => {
@@ -46,20 +79,60 @@ const Transactions = () => {
         try {
             const payload = { amount, type, category, note, createdAt: date };
             
-            if (editingTransaction) {
-                await api.put(`/transactions/${editingTransaction._id}`, payload);
-                toast.success('Transaction Updated ✨');
+            let handledOffline = false;
+            const saveOffline = async () => {
+                if (editingTransaction) {
+                    toast.error('Cannot edit transactions while offline');
+                    throw new Error("Cannot edit offline");
+                } else {
+                    try {
+                        const tempId = `temp-${Date.now()}`;
+                        await addTransactionToSync(payload);
+                        toast.success('Saved Offline. Will sync when connected 📶');
+                        handledOffline = true;
+                        
+                        // Directly update state bypassing any network fetch
+                        setTransactions(prev => [{ ...payload, _id: tempId, isOffline: true }, ...prev]);
+                    } catch (dbErr) {
+                        console.error('IndexedDB Error:', dbErr);
+                        toast.error('Offline storage failed');
+                        throw dbErr;
+                    }
+                }
+            };
+
+            if (!navigator.onLine) {
+                await saveOffline();
             } else {
-                await api.post('/transactions', payload);
-                toast.success('Transaction Recorded 🚀');
+                try {
+                    if (editingTransaction) {
+                        await api.put(`/transactions/${editingTransaction._id}`, payload);
+                        toast.success('Transaction Updated ✨');
+                    } else {
+                        await api.post('/transactions', payload);
+                        toast.success('Transaction Recorded 🚀');
+                    }
+                } catch (netErr) {
+                    const isNetworkFailure = !netErr.response || netErr.code === 'ERR_NETWORK' || netErr.message.includes('Network Error') || netErr.message.includes('timeout');
+                    if (isNetworkFailure) {
+                        console.log('Network error detected during save, falling back to offline storage');
+                        await saveOffline();
+                    } else {
+                        throw netErr;
+                    }
+                }
             }
             
             resetForm();
-            await fetchTransactions();
+            
+            // We only fetch transactions again if we actually talked to the live server
+            if (!handledOffline) {
+               await fetchTransactions(); 
+            }
+            
             setIsModalOpen(false);
         } catch (err) { 
-            console.error(err); 
-            toast.error('Failed to save changes');
+            toast.error('Failed to save changes. Please try again.');
         }
         finally { setSubmitting(false); }
     };
