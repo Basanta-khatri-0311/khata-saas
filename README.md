@@ -1,83 +1,90 @@
 # Khata SaaS
+**Industrial-Grade Financial Infrastructure**
 
 **Live Preview:** [khata-bk.netlify.app](https://khata-bk.netlify.app/)
 
-Khata is a modern, responsive financial ledger and business management platform designed for SaaS multi-tenancy. It provides robust tools for administrators to manage user access and for businesses to efficiently track their income, expenses, and financial health.
+Khata is a high-performance, responsive financial ledger and multi-tenant SaaS platform. Built with an industrial-modern aesthetic, it provides businesses with precision in tracking income, expenses, and credit (Udharo) while maintaining complete data isolation and bilingual localization.
+
+---
 
 ## Key Features
 
-- **Role-Based Access Control (RBAC):** Secure separation of concerns between System Administrators and Business Users.
-- **User Management Portal:** Administrators can easily approve, suspend, or manage user registrations.
-- **Financial Dashboard:** Real-time analytics, cash flow tracking, and category distribution visualized through interactive charts.
-- **Full Ledger System:** Comprehensive transaction tracking with advanced time-based filtering and search mechanisms.
-- **Localization:** Integrated with Bikram Sambat (B.S.) date formats tailored for regional financial compliance.
-- **Seamless Theming:** Native responsive UI with a fully interpolated Dark/Light mode toggle for optimal accessibility.
+- **Industrial-Grade RBAC:** Multi-tenant architecture with atomic role-based access control. Secure data partitioning ensures total tenant isolation.
+- **Offline Ledger Sync:** Connectivity-resilient tracking. Record transactions offline; sync automatically when the connection is restored.
+- **Native Bilingual Engine:** Seamless localized operation. Switch between English and Nepali interfaces instantly across the entire platform.
+- **Udharo (Credit) Control:** Precision credit management. Track pending receivables and payables with automated balance reconciliation and history.
+- **Visual Intelligence Dashboard:** Data-dense analytics using high-frequency engines to visualize cash flow, categories, and growth trends.
+- **Audit Logging & Transparency:** Complete modification tracking. Maintain a clear history of all changes to ensure operational accountability.
+- **Industrial UI System:** Bespoke design system with theme-aware grid backgrounds, noise texture, and fluid scroll animations.
+
+---
 
 ## Technology Stack
 
-**Frontend**
-- React 18
-- React Router DOM v6
-- Context API (State Management)
-- Tailwind CSS (Styling & Design System)
-- Recharts (Data Visualization)
-- Lucide React (Iconography)
+### Frontend
+- **React 18** (UI Core)
+- **Framer Motion** (Scroll Animations & Transitions)
+- **Tailwind CSS** (Design System)
+- **Recharts** (Data Visualization)
+- **Lucide React** (Iconography)
+- **Context API** (State & Theme Management)
 
-**Backend**
-- Node.js & Express.js
-- MongoDB & Mongoose
-- JSON Web Tokens (JWT) & bcrypt.js (Authentication & Security)
+### Backend
+- **Node.js & Express.js** (API Framework)
+- **MongoDB & Mongoose** (Data Layer)
+- **JWT & bcrypt.js** (Security & Encryption)
 
-## Installation & Setup
+---
 
-Ensure you have [Node.js](https://nodejs.org/) (v16+) and [MongoDB](https://www.mongodb.com/) installed on your machine.
+## Installation and Setup
 
-### 1. Clone the repository
+Ensure you have Node.js (v16+) and MongoDB installed.
+
+### 1. Clone Repository
 ```bash
 git clone https://github.com/Basanta-khatri-0311/khata-saas.git
 cd khata-saas
 ```
 
-### 2. Configure Environment Variables
-Create a `.env` file in the `server` directory and add the following keys:
+### 2. Environment Configuration
+Create a .env file in the server directory:
 ```env
-PORT=5200
+PORT=port_number
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secure_jwt_secret
 ```
 
-### 3. Install Dependencies & Run
-
-**Backend:**
+### 3. Initialize Application
+**Server-side:**
 ```bash
-cd server
-npm install
-npm run dev
+cd server && npm install && npm run dev
 ```
 
-**Frontend:**
+**Client-side:**
 ```bash
-cd client
-npm install
-npm run dev
+cd client && npm install && npm run dev
 ```
+
+---
 
 ## Development Roadmap
 
-As part of our commitment to continuous improvement and maximizing impact, the following features are actively being explored for upcoming releases:
+The following units are planned for future releases:
 
-- **Automated Email Workflows:** Trigger secure, automatic email notifications when a pending user registration is approved or rejected by an Administrator.
-- **Multi-Branch / Multi-Store Architectures:** Allowing users to segregate their ledgers into independent branches or physical store locations under a single organization.
-- **Voice-Assisted Transactions:** Implementing speech-to-text integration for rapid, hands-free data entry and ledger logging in fast-paced business environments.
-- **Progressive Web App (PWA) & Offline Mode:** Evolving the platform into an installable PWA with local data caching, enabling seamless ledger management even without an active internet connection.
-- **Custom Financial Reports:** Empowering businesses to dynamically generate, customize, and export deeply tailored financial reports based on specific stakeholder requirements.
+- [ ] **Document Export Engine:** Generation of PDF and CSV financial reports and invoices.
+- [ ] **Bilingual Print Layouts:** Localized printing support for invoices and ledgers in both English and Nepali.
+- [ ] **Automated Workflow Notifications:** Email and SMS alerts for transaction approvals and security events.
+- [ ] **Voice-Assist Data Entry:** Speech-to-text integration for rapid ledger entry.
+- [ ] **Inventory Control Module:** Integration of physical stock tracking within the financial ledger system.
+
+---
 
 ## Deployment
 
-Khata is optimized for modern PaaS platforms.
-- **Frontend:** Pre-configured for Netlify or Vercel (includes `_redirects` for SPA routing).
-- **Backend:** Ready for deployment on Render, Heroku, or DigitalOcean instances.
+Khata is optimized for cloud deployment.
+- **Frontend:** Pre-configured for Netlify or Vercel.
+- **Backend:** Architected for Render, Heroku, or DigitalOcean.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License. See the LICENSE file for details.
