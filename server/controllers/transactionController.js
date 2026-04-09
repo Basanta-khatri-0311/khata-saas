@@ -3,7 +3,7 @@ const TRANSACTION_TYPES = require("../constants/transactionTypes");
 
 const createTransaction = async (req, res) => {
     try {
-        const { amount, type, category, note, createdAt } = req.body;
+        const { amount, type, category, note, createdAt, customerName, customerPhone } = req.body;
         // Destructure the required fields from the request body
 
         const transactionData = {
@@ -12,6 +12,8 @@ const createTransaction = async (req, res) => {
             type,
             category: category || "General",
             note,
+            customerName,
+            customerPhone
         };
         // Insert custom date for testing/seeding if provided
         if (createdAt) transactionData.createdAt = createdAt;
@@ -24,8 +26,8 @@ const createTransaction = async (req, res) => {
         // Send a response with the created transaction and a 201 status code
 
     } catch (error) {
+        console.error("[CREATE ERROR]", error); // Log full error on server
         res.status(400).json({ error: error.message });
-        // Handle any errors that occur during the transaction creation process and send a 500 status code with the error message
     }
 }
 
@@ -47,12 +49,20 @@ const getSummary = async (req, res) => {
 
         let totalSales = 0;
         let totalExpenses = 0;
+        let totalUdharo = 0;
 
         transactions.forEach((tx) => {
+            if (tx.status === 'void') return;
+            
             if (tx.type === TRANSACTION_TYPES.SALE) {
                 totalSales += tx.amount;
             } else if (tx.type === TRANSACTION_TYPES.EXPENSE) {
                 totalExpenses += tx.amount;
+            } else if (tx.type === TRANSACTION_TYPES.UDHARO_SALE) {
+                totalUdharo += tx.amount;
+            } else if (tx.type === TRANSACTION_TYPES.UDHARO_PAYMENT) {
+                totalUdharo -= tx.amount;
+                totalSales += tx.amount; // When they pay back, it's actual income
             }
         });
 
@@ -61,6 +71,7 @@ const getSummary = async (req, res) => {
         res.status(200).json({
             totalSales,
             totalExpenses,
+            totalUdharo,
             profit
         })
     } catch (error) {
@@ -71,7 +82,7 @@ const getSummary = async (req, res) => {
 const updateTransaction = async (req, res) => {
     try {
         const { id } = req.params;
-        const { amount, type, category, note, createdAt } = req.body;
+        const { amount, type, category, note, createdAt, customerName, customerPhone, status } = req.body;
         
         console.log(`[UPDATE] ID: ${id}, User: ${req.user?._id}`);
         
@@ -79,7 +90,10 @@ const updateTransaction = async (req, res) => {
             amount: Number(amount), 
             type, 
             category: category || "General", 
-            note 
+            note,
+            customerName,
+            customerPhone,
+            status: status || "active"
         };
         
         if (createdAt) {

@@ -13,7 +13,7 @@ const transactionSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: Object.values(TRANSACTION_TYPES),
+        enum: ["sale", "expense", "udharo_sale", "udharo_payment"],
         required: true
     },
     category: {
@@ -23,6 +23,19 @@ const transactionSchema = new mongoose.Schema({
     note: {
         type: String,
         default: ""
+    },
+    customerName: {
+        type: String,
+        default: ""
+    },
+    customerPhone: {
+        type: String,
+        default: ""
+    },
+    status: {
+        type: String,
+        enum: ["active", "void"],
+        default: "active"
     },
     createdAt: {
         type: Date,
