@@ -8,18 +8,53 @@ import api from '../services/api';
 import { Plus, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { addTransactionToSync, getTransactionsToSync } from '../services/db';
+import { useSettings } from '../context/SettingsContext';
+
+const translations = {
+    en: {
+        overview: 'Overview',
+        todayAtGlance: 'Today at a glance.',
+        newEntry: 'New Entry',
+        todayTransactions: "Today's Ledger",
+        offlineSyncSuccess: 'Offline transactions synced successfully!',
+        offlineEditError: 'Cannot edit transactions while offline',
+        offlineSaveSuccess: 'Saved Offline. Will sync when connected 📶',
+        onlineSaveSuccess: 'Transaction Recorded 🚀',
+        onlineUpdateSuccess: 'Transaction Updated ✨',
+        showingResults: 'Showing results for:',
+        recordRemoved: 'Transaction Removed 🗑️',
+        editError: 'Failed to delete transaction'
+    },
+    ne: {
+        overview: 'विवरण (Overview)',
+        todayAtGlance: 'आजको कारोबार एक नजरमा।',
+        newEntry: 'नयाँ प्रविष्टि',
+        todayTransactions: 'आजको आर्थिक खाता',
+        offlineSyncSuccess: 'अफलाइन कारोबारहरू सफलतापूर्वक सिंक गरियो!',
+        offlineEditError: 'अफलाइन हुँदा सम्पादन गर्न मिल्दैन',
+        offlineSaveSuccess: 'अफलाइन सुरक्षित गरियो। नेट जोडिएपछि सिंक हुनेछ 📶',
+        onlineSaveSuccess: 'कारोबार रेकर्ड गरियो 🚀',
+        onlineUpdateSuccess: 'कारोबार सम्पादन गरियो ✨',
+        showingResults: 'खोजिएका नतिजाहरू:',
+        recordRemoved: 'कारोबार हटाइयो 🗑️',
+        editError: 'कारोबार हटाउन असफल भयो'
+    }
+};
 
 const Dashboard = () => {
+    const { settings } = useSettings();
+    const lang = settings?.language || 'ne';
+    const t = translations[lang];
     const { searchQuery } = useOutletContext();
     const [summary, setSummary] = useState({ totalSales: 0, totalExpenses: 0, profit: 0 });
     const [transactions, setTransactions] = useState([]);
-    
+
     // Modal & Form State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [transactionToDelete, setTransactionToDelete] = useState(null);
     const [editingTransaction, setEditingTransaction] = useState(null);
-    
+
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('sale');
     const [category, setCategory] = useState('');
@@ -27,7 +62,7 @@ const Dashboard = () => {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
-    
+
     // App State
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -49,6 +84,13 @@ const Dashboard = () => {
 
         return () => window.removeEventListener('transactions-updated', handleSyncUpdate);
     }, []);
+
+    // Sync date state when settings load
+    useEffect(() => {
+        if (settings && !editingTransaction && !isModalOpen) {
+            setDate(new Date().toISOString().split('T')[0]);
+        }
+    }, [settings, isModalOpen, editingTransaction]);
 
     const fetchSummary = async () => {
         try {
@@ -92,7 +134,7 @@ const Dashboard = () => {
         setSubmitting(true);
         try {
             const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone };
-            
+
             let handledOffline = false;
             const saveOffline = async () => {
                 if (editingTransaction) {
@@ -141,7 +183,7 @@ const Dashboard = () => {
                     const numAmount = Number(payload.amount);
                     const isSale = payload.type === 'sale';
                     const isUdharo = payload.type === 'udharo_sale';
-                    
+
                     const newSales = isSale ? prev.totalSales + numAmount : prev.totalSales;
                     const newExpenses = (payload.type === 'expense') ? prev.totalExpenses + numAmount : prev.totalExpenses;
                     const newUdharo = isUdharo ? (prev.totalUdharo || 0) + numAmount : (prev.totalUdharo || 0);
@@ -157,8 +199,8 @@ const Dashboard = () => {
                 await Promise.all([fetchSummary(), fetchTransactions()]);
             }
             setIsModalOpen(false);
-        } catch (err) { 
-            console.error('SAVE FAILURE:', err); 
+        } catch (err) {
+            console.error('SAVE FAILURE:', err);
             toast.error(err?.response?.data?.error || 'Failed to save changes. Please try again.');
         }
         finally { setSubmitting(false); }
@@ -175,7 +217,7 @@ const Dashboard = () => {
             setTransactionToDelete(null);
         } catch (err) {
             console.error(err);
-            toast.error('Failed to delete transaction');
+            toast.error(t.editError);
         } finally {
             setSubmitting(false);
         }
@@ -217,11 +259,12 @@ const Dashboard = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const todayDateStr = new Date().toISOString().split('T')[0];
+    const todayAD = new Date().toISOString().split('T')[0];
 
     const todaysTransactions = transactions.filter(tx => {
-        const txDate = new Date(tx.createdAt).toISOString().split('T')[0];
-        return txDate === todayDateStr;
+        if (!tx.createdAt) return false;
+        const txDateAD = new Date(tx.createdAt).toISOString().split('T')[0];
+        return txDateAD === todayAD;
     });
 
     if (loading) return (
@@ -235,16 +278,16 @@ const Dashboard = () => {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Overview</h1>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Today at a glance.</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">{t.overview}</h1>
+                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t.todayAtGlance}</p>
                 </div>
-                
-                <button 
+
+                <button
                     onClick={() => { resetForm(); setIsModalOpen(true); }}
                     className="flex items-center justify-center gap-2 px-8 h-14 bg-black dark:bg-white text-white dark:text-black font-black rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] active:scale-95 transition-all transition-colors"
                 >
                     <Plus className="w-5 h-5" strokeWidth={3} />
-                    New Entry
+                    {t.newEntry}
                 </button>
             </div>
 
@@ -256,23 +299,23 @@ const Dashboard = () => {
                     {searchQuery && (
                         <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-sm font-bold w-fit animate-in fade-in slide-in-from-left-4">
                             <Search className="w-4 h-4" />
-                            Showing results for: "{searchQuery}"
+                            {t.showingResults} "{searchQuery}"
                         </div>
                     )}
-                    
-                    <TransactionTable 
-                        transactions={todaysTransactions} 
+
+                    <TransactionTable
+                        transactions={todaysTransactions}
                         searchQuery={searchQuery}
                         onUpdate={fetchSummary}
                         onEdit={openEditModal}
                         onDelete={openDeleteModal}
-                        title="Today's Transactions"
+                        title={t.todayTransactions}
                     />
                 </div>
             </div>
 
             {/* Transaction Modal */}
-            <TransactionModal 
+            <TransactionModal
                 isOpen={isModalOpen}
                 onClose={() => { setIsModalOpen(false); setEditingTransaction(null); }}
                 addTransaction={handleSave}
@@ -296,7 +339,7 @@ const Dashboard = () => {
             />
 
             {/* Delete Confirmation Modal */}
-            <DeleteConfirmModal 
+            <DeleteConfirmModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => { setIsDeleteModalOpen(false); setTransactionToDelete(null); }}
                 onConfirm={handleDelete}

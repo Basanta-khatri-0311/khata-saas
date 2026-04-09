@@ -4,21 +4,46 @@ import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, Chevron
 import { useSettings } from '../../context/SettingsContext';
 import { useAuth } from '../../context/AuthContext';
 
+const translations = {
+    en: {
+        dashboard: 'Dashboard',
+        transactions: 'Transactions',
+        udharo: 'Udharo',
+        reports: 'Reports',
+        settings: 'Settings',
+        admin: 'Admin Panel',
+        logout: 'Log Out',
+        subtitle: 'Khata System'
+    },
+    ne: {
+        dashboard: 'ड्यासबोर्ड',
+        transactions: 'कारोबारहरू',
+        udharo: 'उधारो खाता',
+        reports: 'रिपोर्टहरू',
+        settings: 'सेटिङहरू',
+        admin: 'एडमिन प्यानल',
+        logout: 'लगाउट (Logout)',
+        subtitle: 'खाता प्रणाली'
+    }
+};
+
 const Sidebar = ({ isOpen, setIsOpen }) => {
     const { settings } = useSettings();
     const { logout, user } = useAuth();
     const isAdmin = user?.role === 'admin';
+    const lang = settings?.language || 'ne';
+    const t = translations[lang];
 
     const businessItems = [
-        { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-        { label: 'Transactions', path: '/transactions', icon: ReceiptText },
-        { label: 'Udharo', path: '/udharo', icon: Wallet },
-        { label: 'Reports', path: '/reports', icon: PieChart },
-        { label: 'Settings', path: '/settings', icon: SettingsIcon },
+        { label: t.dashboard, path: '/dashboard', icon: LayoutDashboard },
+        { label: t.transactions, path: '/transactions', icon: ReceiptText },
+        { label: t.udharo, path: '/udharo', icon: Wallet },
+        { label: t.reports, path: '/reports', icon: PieChart },
+        { label: t.settings, path: '/settings', icon: SettingsIcon },
     ];
 
     const adminItems = [
-        { label: 'Admin Panel', path: '/admin', icon: ShieldCheck },
+        { label: t.admin, path: '/admin', icon: ShieldCheck },
     ];
 
     const menuItems = isAdmin ? adminItems : businessItems;
@@ -27,23 +52,23 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         <>
             {/* Mobile backdrop */}
             {isOpen && (
-                <div 
+                <div
                     className="fixed inset-0 bg-slate-900/50 dark:bg-black/80 z-40 md:hidden backdrop-blur-sm"
                     onClick={() => setIsOpen(false)}
                 />
             )}
-            
+
             {/* Sidebar container */}
             <aside className={`
                 fixed md:relative inset-y-0 left-0 z-50
                 flex flex-col bg-white dark:bg-[#050505] border-r border-slate-200 dark:border-white/[0.05]
                 transition-all duration-300 ease-in-out shrink-0
-                ${isOpen 
-                    ? 'translate-x-0 w-[280px] p-6' 
+                ${isOpen
+                    ? 'translate-x-0 w-[280px] p-6'
                     : '-translate-x-full md:translate-x-0 md:w-[84px] p-6 md:p-4 md:py-6'}
             `}>
                 {/* Desktop Toggle Button */}
-                <button 
+                <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="absolute -right-3 top-8 hidden md:flex items-center justify-center w-6 h-6 bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/10 rounded-full shadow-sm text-slate-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white transition-transform z-50"
                 >
@@ -61,21 +86,21 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                                     {settings?.businessName || 'Khata'}
                                 </span>
                                 <span className="text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-widest">
-                                    {settings?.businessSubtitle || 'खाता प्रणाली'}
+                                    {settings?.businessSubtitle || t.subtitle}
                                 </span>
                             </div>
                         )}
                     </div>
-                    <button 
+                    <button
                         onClick={() => setIsOpen(false)}
                         className="md:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg"
                     >
                         <X className="w-5 h-5 dark:text-gray-400" />
                     </button>
                 </div>
-                
+
                 <nav className="flex flex-col gap-2 flex-1 mt-8">
-                    {isOpen && <div className="text-[11px] font-semibold text-slate-400 dark:text-gray-600 uppercase tracking-wider mb-2 px-3 whitespace-nowrap transition-opacity">Menu</div>}
+                    {isOpen && <div className="text-[11px] font-semibold text-slate-400 dark:text-gray-600 uppercase tracking-wider mb-2 px-3 whitespace-nowrap transition-opacity">{t.menu}</div>}
                     {menuItems.map(({ label, path, icon: Icon }) => (
                         <NavLink
                             key={label}
@@ -99,13 +124,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
                 {/* Logout Button */}
                 <div className="pt-6 mt-6 border-t border-slate-100 dark:border-white/5 font-sans">
-                    <button 
+                    <button
                         onClick={logout}
                         className={`flex items-center ${isOpen ? 'gap-3 px-3 w-full' : 'justify-center'} py-3 rounded-xl transition-all duration-200 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold group`}
-                        title={!isOpen ? 'Logout' : ''}
+                        title={!isOpen ? t.logout : ''}
                     >
                         <LogOut className="w-5 h-5 shrink-0" strokeWidth={2.5} />
-                        {isOpen && <span className="text-[14px]">Log Out</span>}
+                        {isOpen && <span className="text-[14px]">{t.logout}</span>}
                     </button>
                 </div>
             </aside>

@@ -8,7 +8,47 @@ import { isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import { Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { addTransactionToSync, getTransactionsToSync } from '../services/db';
+import { useSettings } from '../context/SettingsContext';
+
+const translations = {
+    en: {
+        title: 'Master Ledger',
+        subtitle: 'Your complete financial history.',
+        exportData: 'Export Data',
+        all: 'All',
+        week: 'Week',
+        month: 'Month',
+        year: 'Year',
+        ledgerTitle: 'Complete Records',
+        offlineSyncSuccess: 'Offline transactions synced successfully!',
+        offlineEditError: 'Cannot edit transactions while offline',
+        onlineSaveSuccess: 'Transaction Recorded 🚀',
+        onlineUpdateSuccess: 'Transaction Updated ✨',
+        recordRemoved: 'Transaction Removed 🗑️',
+        editError: 'Failed to delete transaction'
+    },
+    ne: {
+        title: 'मुख्य आर्थिक बहिखाता',
+        subtitle: 'तपाईंको सम्पूर्ण कारोबारको इतिहास।',
+        exportData: 'डाटा निर्यात (Export)',
+        all: 'सबै',
+        week: 'हप्ता',
+        month: 'महिना',
+        year: 'वर्ष',
+        ledgerTitle: 'सम्पूर्ण रेकर्डहरू',
+        offlineSyncSuccess: 'अफलाइन कारोबारहरू सफलतापूर्वक सिंक गरियो!',
+        offlineEditError: 'अफलाइन हुँदा सम्पादन गर्न मिल्दैन',
+        onlineSaveSuccess: 'कारोबार रेकर्ड गरियो 🚀',
+        onlineUpdateSuccess: 'कारोबार सम्पादन गरियो ✨',
+        recordRemoved: 'कारोबार हटाइयो 🗑️',
+        editError: 'कारोबार हटाउन असफल भयो'
+    }
+};
+
 const Transactions = () => {
+    const { settings } = useSettings();
+    const lang = settings?.language || 'ne';
+    const t = translations[lang];
     const { searchQuery } = useOutletContext();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -41,6 +81,13 @@ const Transactions = () => {
 
         return () => window.removeEventListener('transactions-updated', handleSyncUpdate);
     }, []);
+
+    // Sync date state when settings load
+    useEffect(() => {
+        if (settings && !editingTransaction && !isModalOpen) {
+            setDate(new Date().toISOString().split('T')[0]);
+        }
+    }, [settings, isModalOpen, editingTransaction]);
 
     const fetchTransactions = async () => {
         try {
@@ -225,8 +272,8 @@ const Transactions = () => {
         <div className="flex flex-col h-full min-h-[600px] gap-8 pb-10">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Master Ledger</h1>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Your complete financial history.</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">{t.title}</h1>
+                    <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t.subtitle}</p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3">
@@ -235,17 +282,22 @@ const Transactions = () => {
                         className="flex items-center gap-2 h-12 px-6 bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 transition-colors"
                     >
                         <Download className="w-4 h-4" strokeWidth={3} />
-                        Export Data
+                        {t.exportData}
                     </button>
 
                     <div className="flex bg-white dark:bg-[#0a0a0a] p-1 rounded-xl border border-slate-200 dark:border-white/[0.05] shadow-sm">
-                        {['all', 'week', 'month', 'year'].map(f => (
+                        {[
+                            { id: 'all', label: t.all },
+                            { id: 'week', label: t.week },
+                            { id: 'month', label: t.month },
+                            { id: 'year', label: t.year }
+                        ].map(f => (
                             <button
-                                key={f}
-                                onClick={() => setTimeFilter(f)}
-                                className={`px-4 py-2 text-[10px] uppercase tracking-widest font-black rounded-lg transition-all ${timeFilter === f ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                                key={f.id}
+                                onClick={() => setTimeFilter(f.id)}
+                                className={`px-4 py-2 text-[10px] uppercase tracking-widest font-black rounded-lg transition-all ${timeFilter === f.id ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:hover:text-gray-300'}`}
                             >
-                                {f}
+                                {f.label}
                             </button>
                         ))}
                     </div>
@@ -259,7 +311,7 @@ const Transactions = () => {
                     loading={loading}
                     onDelete={openDeleteModal}
                     onEdit={openEditModal}
-                    title="All Ledger"
+                    title={t.ledgerTitle}
                 />
             </div>
 

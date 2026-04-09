@@ -2,13 +2,12 @@ import React from 'react';
 import { Search, Calendar, Menu, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import NepaliDate from 'nepali-date-converter';
 
 const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }) => {
     const { theme, toggleTheme } = useTheme();
     const { user } = useAuth();
     const isAdmin = user?.role === 'admin';
-    const npDate = new NepaliDate();
+    const today = new Date();
 
     return (
         <header className="h-20 flex items-center justify-between px-4 sm:px-8 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/[0.05] shrink-0 z-10 transition-colors duration-300">
@@ -49,7 +48,11 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }
                 <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
                     <Calendar className="w-4 h-4 text-indigo-500" strokeWidth={2.5} />
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-gray-300">
-                        {npDate.format('YYYY MMMM DD')} B.S.
+                        {today.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}
                     </span>
                 </div>
             </div>

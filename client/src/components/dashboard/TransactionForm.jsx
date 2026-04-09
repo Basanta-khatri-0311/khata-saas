@@ -2,6 +2,49 @@ import React, { useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 
+const translations = {
+    en: {
+        receipt: 'Receipt',
+        payment: 'Payment',
+        udharo: 'Udharo',
+        settle: 'Settle',
+        amount: 'Amount',
+        category: 'Transaction Category',
+        date: 'Transaction Date',
+        description: 'Description',
+        descPlaceholder: 'What was this for?',
+        confirm: 'Confirm Entry',
+        customerName: 'Customer Name',
+        customerPhone: 'Phone Number',
+        phonePlaceholder: 'Mobile/WhatsApp',
+        selectDebtor: 'Select Debtor',
+        chooseCustomer: '-- Choose Customer --',
+        fullName: 'Full Name',
+        quickEntry: 'Quick Entry',
+        recordNew: 'Record a new transaction'
+    },
+    ne: {
+        receipt: 'रसिद (आम्दानी)',
+        payment: 'भुक्तानी (खर्च)',
+        udharo: 'उधारो',
+        settle: 'हिसाब मिलान',
+        amount: 'रकम',
+        category: 'कारोबारको वर्ग',
+        date: 'कारोबार मिति',
+        description: 'विवरण',
+        descPlaceholder: 'यो केका लागि थियो?',
+        confirm: 'रेकर्ड सुनिश्चित गर्नुहोस्',
+        customerName: 'ग्राहकको नाम',
+        customerPhone: 'फोन नम्बर',
+        phonePlaceholder: 'मोबाइल/वाट्सएप',
+        selectDebtor: 'ऋणी छान्नुहोस्',
+        chooseCustomer: '-- ग्राहक छान्नुहोस् --',
+        fullName: 'पुरा नाम',
+        quickEntry: 'द्रुत प्रविष्टि',
+        recordNew: 'नयाँ कारोबार रेकर्ड गर्नुहोस्'
+    }
+};
+
 const TransactionForm = ({ 
     addTransaction, 
     submitting, 
@@ -23,7 +66,9 @@ const TransactionForm = ({
     isModal = false 
 }) => {
     const { settings } = useSettings();
-    const categories = type === 'sale' ? (settings?.incomeCategories || []) : (settings?.expenseCategories || []);
+    const categories = (type === 'sale' || type === 'udharo_sale') ? (settings?.incomeCategories || []) : (settings?.expenseCategories || []);
+    const lang = settings?.language || 'ne';
+    const t = translations[lang];
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -47,7 +92,7 @@ const TransactionForm = ({
                             ? 'bg-white dark:bg-white/10 text-emerald-600 dark:text-emerald-400 shadow-sm'
                             : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'
                         }`}
-                >Receipt</button>
+                >{t.receipt}</button>
                 <button
                     type="button"
                     onClick={() => setType('expense')}
@@ -56,7 +101,7 @@ const TransactionForm = ({
                             ? 'bg-white dark:bg-white/10 text-rose-600 dark:text-rose-400 shadow-sm'
                             : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'
                         }`}
-                >Payment</button>
+                >{t.payment}</button>
                 <button
                     type="button"
                     onClick={() => setType('udharo_sale')}
@@ -65,7 +110,7 @@ const TransactionForm = ({
                             ? 'bg-white dark:bg-white/10 text-amber-600 dark:text-amber-400 shadow-sm'
                             : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'
                         }`}
-                >Udharo</button>
+                >{t.udharo}</button>
                 <button
                     type="button"
                     onClick={() => setType('udharo_payment')}
@@ -74,12 +119,12 @@ const TransactionForm = ({
                             ? 'bg-white dark:bg-white/10 text-cyan-600 dark:text-cyan-400 shadow-sm'
                             : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'
                         }`}
-                >Settle</button>
+                >{t.settle}</button>
             </div>
 
             {/* Amount Input */}
             <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">Amount</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">{t.amount}</label>
                 <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-gray-500 font-bold">Rs.</span>
                     <input
@@ -100,7 +145,7 @@ const TransactionForm = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex flex-col gap-1.5">
                         <label className="text-[10px] font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1">
-                            {type === 'udharo_payment' ? 'Select Debtor' : 'Customer Name'}
+                            {type === 'udharo_payment' ? t.selectDebtor : t.customerName}
                         </label>
                         {type === 'udharo_payment' && debtors.length > 0 ? (
                             <div className="relative">
@@ -118,7 +163,7 @@ const TransactionForm = ({
                                     required
                                     className="w-full h-12 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-all appearance-none cursor-pointer pr-10"
                                 >
-                                    <option value="" disabled className="text-slate-400">-- Choose Customer --</option>
+                                    <option value="" disabled className="text-slate-400">{t.chooseCustomer}</option>
                                     {debtors.map((d, idx) => (
                                         <option key={idx} value={d.name} className="text-slate-900 bg-white dark:bg-[#0a0a0a]">{d.name} (Bal: Rs. {d.balance})</option>
                                     ))}
@@ -130,7 +175,7 @@ const TransactionForm = ({
                         ) : (
                             <input
                                 type="text"
-                                placeholder="Full Name"
+                                placeholder={t.fullName}
                                 value={customerName || ''}
                                 onChange={(e) => setCustomerName(e.target.value)}
                                 required
@@ -139,10 +184,10 @@ const TransactionForm = ({
                         )}
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1">Phone Number</label>
+                        <label className="text-[10px] font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1">{t.customerPhone}</label>
                         <input
                             type="tel"
-                            placeholder="Mobile/WhatsApp"
+                            placeholder={t.phonePlaceholder}
                             value={customerPhone || ''}
                             onChange={(e) => setCustomerPhone(e.target.value)}
                             className="w-full h-12 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-gray-600 outline-none focus:border-indigo-500 transition-all shadow-sm focus:ring-4 focus:ring-indigo-500/10"
@@ -151,10 +196,10 @@ const TransactionForm = ({
                 </div>
             )}
 
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col sm:flex-row gap-5">
                 {/* Category Dropdown */}
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">Transaction Category</label>
+                <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">{t.category}</label>
                     <div className="relative">
                         <select
                             value={category}
@@ -171,9 +216,8 @@ const TransactionForm = ({
                     </div>
                 </div>
 
-                {/* Date Picker */}
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">Transaction Date</label>
+                <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">{t.date}</label>
                     <input
                         type="date"
                         max={today}
@@ -186,13 +230,13 @@ const TransactionForm = ({
 
             {/* Description Input */}
             <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">Description</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">{t.description}</label>
                 <input
                     type="text"
-                    placeholder="What was this for?"
+                    placeholder={t.descPlaceholder}
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    className="w-full h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-600 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                    className="w-full h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-600 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-sans"
                 />
             </div>
 
@@ -206,7 +250,7 @@ const TransactionForm = ({
                 ) : (
                     <>
                         <Plus className="w-5 h-5" strokeWidth={3} />
-                        Confirm Entry
+                        {t.confirm}
                     </>
                 )}
             </button>
@@ -218,8 +262,8 @@ const TransactionForm = ({
     return (
         <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl shadow-sm border border-slate-200 dark:border-white/[0.05] p-5 sm:p-6 transition-colors">
             <div className="mb-6">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Quick Entry</h2>
-                <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Record a new transaction</p>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{t.quickEntry}</h2>
+                <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t.recordNew}</p>
             </div>
             {formContent}
         </div>

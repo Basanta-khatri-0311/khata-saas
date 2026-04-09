@@ -43,12 +43,12 @@ const LandingPage = () => {
             {/* Clean Hero System */}
             <section className="sm:pt-42 pt-36 pb-32 px-6 sm:px-16 max-w-7xl mx-auto flex flex-col items-start text-left">
 
-                <h1 className="text-6xl sm:text-8xl font-black tracking-tighter leading-[0.85] mb-10 max-w-3xl">
+                <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] sm:leading-[0.85] mb-10 max-w-3xl">
                     Industrial <br /> Financial <br /> Ledger.
                 </h1>
 
                 <p className="text-lg sm:text-xl font-medium text-slate-500 dark:text-zinc-400 max-w-xl leading-relaxed mb-12 border-l-2 border-slate-200 dark:border-zinc-800 pl-8">
-                    A multi-tenant SaaS infrastructure designed for businesses that demand precision, multitenancy, and Bikram Sambat localization. Built for high-volume ledger operations.
+                    A multi-tenant SaaS infrastructure designed for businesses that demand precision, multitenancy, and complete bilingual localization. Built for high-volume ledger operations.
                 </p>
 
                 <div className="flex flex-wrap items-center gap-6">
@@ -86,12 +86,12 @@ const LandingPage = () => {
                         {/* Entry 02 */}
                         <div className="space-y-6">
 
-                            <h3 className="text-3xl font-black tracking-tight uppercase">B.S. Date Sync</h3>
+                            <h3 className="text-3xl font-black tracking-tight uppercase">Bilingual Ops</h3>
                             <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed max-w-md">
-                                Native Bikram Sambat integration. Align your financial reports with local tax regulations effortlessly. Sync global ledger entries with the regional B.S. calendar.
+                                Native Bilingual integration. Switch seamlessly between English and Nepali interfaces. Standardize your financial reports globally while operating locally.
                             </p>
                             <ul className="space-y-3">
-                                {['Precise Conversion', 'IRD Compliance', 'Regional Sync'].map(f => (
+                                {['English / Nepali', 'Regional Labels', 'Global Sync'].map(f => (
                                     <li key={f} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40">
                                         <div className="w-1 h-4 bg-emerald-500" /> {f}
                                     </li>

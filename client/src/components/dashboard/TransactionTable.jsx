@@ -1,7 +1,5 @@
 import React from 'react';
 import { ReceiptText, Calendar, TrendingUp, TrendingDown, Trash2, User as UserIcon } from 'lucide-react';
-import NepaliDate from 'nepali-date-converter';
-
 const formatNPR = (val) =>
     'Rs. ' + Number(val || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -27,8 +25,8 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                 </div>
             </div>
 
-            <div className="overflow-y-auto w-full flex-1 p-2 custom-scrollbar flex flex-col relative">
-                <table className="w-full border-collapse">
+            <div className="overflow-x-auto overflow-y-auto w-full flex-1 p-0 sm:p-2 custom-scrollbar flex flex-col relative">
+                <table className="w-full border-collapse min-w-[500px] sm:min-w-0">
                     <thead className="sticky top-0 bg-white dark:bg-[#0a0a0a] z-10 transition-colors">
                         <tr>
                             {['Date', 'Details', 'Amount', ''].map((h, i) => (
@@ -68,12 +66,9 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                             </tr>
                         )}
                         {!loading && filteredTransactions.length > 0 && filteredTransactions.map((tx) => {
-                            let bsDateStr = 'N/A'
-                            try {
-                                if (tx.createdAt) {
-                                    bsDateStr = new NepaliDate(new Date(tx.createdAt)).format('YYYY-MM-DD')
-                                }
-                            } catch (e) {}
+                            const displayDate = tx.createdAt 
+                                ? new Date(tx.createdAt).toLocaleDateString() 
+                                : 'N/A';
 
                             const isSale = tx.type === 'sale';
 
@@ -81,9 +76,9 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                                 <tr key={tx._id} className="group hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors rounded-xl overflow-hidden">
                                     <td className="p-3 sm:p-4 whitespace-nowrap align-middle">
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-slate-900 dark:text-white">{bsDateStr}</span>
+                                            <span className="text-sm font-bold text-slate-900 dark:text-white">{displayDate}</span>
                                             <span className="text-xs font-semibold text-slate-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
-                                                <Calendar className="w-3 h-3 text-gray-500" /> BS
+                                                <Calendar className="w-3 h-3 text-gray-500" />
                                             </span>
                                         </div>
                                     </td>
@@ -110,11 +105,11 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                                         </div>
                                     </td>
                                     <td className="p-3 sm:p-4 text-right align-middle">
-                                        <span className={`text-sm sm:text-base font-bold whitespace-nowrap ${isSale ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>
+                                        <span className={`text-sm sm:text-base font-bold whitespace-nowrap ${isSale ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}`}>
                                             {isSale ? '+' : '-'}{formatNPR(tx.amount)}
                                         </span>
                                     </td>
-                                    <td className="p-2 sm:p-4 w-28 align-middle text-right px-2 sm:px-4">
+                                    <td className="p-2 sm:p-4 w-24 align-middle text-right px-2 sm:px-4">
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => onEdit(tx)}

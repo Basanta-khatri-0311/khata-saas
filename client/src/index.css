@@ -11,10 +11,23 @@
 body {
   font-family: 'Geist', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Prevent layout shift when scrollbar disappears */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Modal Open State */
+.modal-open {
+  overflow: hidden !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
+  height: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -22,12 +35,20 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #262629;
-  border-radius: 4px;
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #94a3b8;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 /* Custom Animations for Landing Page */

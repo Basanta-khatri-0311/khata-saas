@@ -10,7 +10,8 @@ export const SettingsProvider = ({ children }) => {
         businessName: 'Khata',
         businessSubtitle: 'खाता प्रणाली',
         incomeCategories: ['General Income', 'Sales', 'Services'],
-        expenseCategories: ['General Expense', 'Rent', 'Khaja', 'Salary', 'Internet']
+        expenseCategories: ['General Expense', 'Rent', 'Khaja', 'Salary', 'Internet'],
+        language: 'ne'
     });
     const [loading, setLoading] = useState(true);
 
@@ -45,7 +46,8 @@ export const SettingsProvider = ({ children }) => {
                 businessName: 'Khata',
                 businessSubtitle: 'खाता प्रणाली',
                 incomeCategories: ['General Income', 'Sales', 'Services'],
-                expenseCategories: ['General Expense', 'Rent', 'Khaja', 'Salary', 'Internet']
+                expenseCategories: ['General Expense', 'Rent', 'Khaja', 'Salary', 'Internet'],
+                language: 'ne'
             });
             setLoading(false);
         }
