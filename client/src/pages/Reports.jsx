@@ -16,7 +16,7 @@ const Reports = () => {
     const fetchTransactions = async () => {
         try {
             const res = await api.get('/transactions');
-            setTransactions(res.data);
+            setTransactions(res.data.data || res.data);
         } catch (err) { console.error(err); }
         finally { setLoading(false); }
     };
