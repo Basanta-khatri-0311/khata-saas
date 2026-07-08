@@ -38,7 +38,9 @@ const TransactionModal = ({
     customerPhone,
     setCustomerPhone,
     debtors = [],
-    isEditing = false
+    isEditing = false,
+    recurrence,
+    setRecurrence,
 }) => {
     const { settings } = useSettings();
     const lang = settings?.language || 'ne';
@@ -105,6 +107,8 @@ const TransactionModal = ({
                         setCustomerPhone={setCustomerPhone}
                         debtors={debtors}
                         isModal={true}
+                        recurrence={recurrence}
+                        setRecurrence={setRecurrence}
                     />
                 </div>
             </div>

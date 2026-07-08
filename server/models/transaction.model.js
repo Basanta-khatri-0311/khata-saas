@@ -9,7 +9,8 @@ const transactionSchema = new mongoose.Schema({
     },
     amount: {
         type: Number,
-        required: true
+        required: true,
+        min: [0.01, 'Amount must be greater than 0.']
     },
     type: {
         type: String,
@@ -36,6 +37,15 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         enum: ["active", "void"],
         default: "active"
+    },
+    recurrence: {
+        type: String,
+        enum: ["none", "daily", "weekly", "monthly"],
+        default: "none"
+    },
+    nextDueDate: {
+        type: Date,
+        default: null
     },
     createdAt: {
         type: Date,

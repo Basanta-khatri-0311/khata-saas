@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import api from '../services/api';
 import TransactionTable from '../components/dashboard/TransactionTable';
 import TransactionModal from '../components/dashboard/TransactionModal';
 import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
+import LedgerExporter from '../components/dashboard/LedgerExporter';
 import { isThisWeek, isThisMonth, isThisYear } from 'date-fns';
-import { Download } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { addTransactionToSync, getTransactionsToSync } from '../services/db';
 import { useSettings } from '../context/SettingsContext';
@@ -54,6 +56,8 @@ const Transactions = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [timeFilter, setTimeFilter] = useState('all');
+    const [isPrintingLedger, setIsPrintingLedger] = useState(false);
+    const ledgerRef = useRef(null);
 
     // Modal & Form State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,6 +73,7 @@ const Transactions = () => {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
+    const [recurrence, setRecurrence] = useState('none');
 
     useEffect(() => {
         fetchTransactions();
@@ -81,6 +86,17 @@ const Transactions = () => {
 
         return () => window.removeEventListener('transactions-updated', handleSyncUpdate);
     }, []);
+
+    // Trigger print after ledger state populates
+    useEffect(() => {
+        if (isPrintingLedger) {
+            const timer = setTimeout(() => {
+                window.print();
+                setIsPrintingLedger(false);
+            }, 150);
+            return () => clearTimeout(timer);
+        }
+    }, [isPrintingLedger]);
 
     // Sync date state when settings load
     useEffect(() => {
@@ -126,7 +142,7 @@ const Transactions = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone };
+            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone, recurrence };
             
             let handledOffline = false;
             const saveOffline = async () => {
@@ -220,6 +236,7 @@ const Transactions = () => {
         setType('sale');
         setCustomerName('');
         setCustomerPhone('');
+        setRecurrence('none');
         setEditingTransaction(null);
     };
 
@@ -232,6 +249,7 @@ const Transactions = () => {
         setNote(tx.note);
         setCustomerName(tx.customerName || '');
         setCustomerPhone(tx.customerPhone || '');
+        setRecurrence(tx.recurrence || 'none');
         setIsModalOpen(true);
     };
 
@@ -279,10 +297,19 @@ const Transactions = () => {
                 <div className="flex flex-wrap items-center gap-3">
                     <button 
                         onClick={exportToCSV}
-                        className="flex items-center gap-2 h-12 px-6 bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 transition-colors"
+                        className="flex items-center gap-2 h-12 px-5 bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95"
                     >
                         <Download className="w-4 h-4" strokeWidth={3} />
                         {t.exportData}
+                    </button>
+
+                    <button
+                        onClick={() => setIsPrintingLedger(true)}
+                        disabled={filteredTransactions.length === 0}
+                        className="flex items-center gap-2 h-12 px-5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-40"
+                    >
+                        <FileText className="w-4 h-4" strokeWidth={2.5} />
+                        {lang === 'ne' ? 'PDF प्रिन्ट' : 'Print PDF'}
                     </button>
 
                     <div className="flex bg-white dark:bg-[#0a0a0a] p-1 rounded-xl border border-slate-200 dark:border-white/[0.05] shadow-sm">
@@ -337,6 +364,8 @@ const Transactions = () => {
                 setCustomerPhone={setCustomerPhone}
                 debtors={debtors}
                 isEditing={!!editingTransaction}
+                recurrence={recurrence}
+                setRecurrence={setRecurrence}
             />
 
             {/* Delete Confirmation Modal */}
@@ -346,6 +375,16 @@ const Transactions = () => {
                 onConfirm={handleDelete}
                 submitting={submitting}
             />
+
+            {/* PDF Ledger Exporter — rendered at document root to avoid clipping */}
+            {isPrintingLedger && typeof document !== 'undefined' && createPortal(
+                <LedgerExporter 
+                    ref={ledgerRef}
+                    transactions={filteredTransactions} 
+                    timeFilter={timeFilter} 
+                />, 
+                document.body
+            )}
         </div>
     );
 };

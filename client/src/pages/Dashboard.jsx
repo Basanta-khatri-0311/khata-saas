@@ -62,6 +62,7 @@ const Dashboard = () => {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
+    const [recurrence, setRecurrence] = useState('none');
 
     // App State
     const [loading, setLoading] = useState(true);
@@ -133,7 +134,7 @@ const Dashboard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone };
+            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone, recurrence };
 
             let handledOffline = false;
             const saveOffline = async () => {
@@ -239,6 +240,7 @@ const Dashboard = () => {
         setType('sale');
         setCustomerName('');
         setCustomerPhone('');
+        setRecurrence('none');
         setEditingTransaction(null);
     };
 
@@ -336,6 +338,8 @@ const Dashboard = () => {
                 setCustomerPhone={setCustomerPhone}
                 debtors={debtors}
                 isEditing={!!editingTransaction}
+                recurrence={recurrence}
+                setRecurrence={setRecurrence}
             />
 
             {/* Delete Confirmation Modal */}

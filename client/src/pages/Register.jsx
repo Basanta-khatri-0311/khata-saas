@@ -17,6 +17,10 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters long.');
+            return;
+        }
         setLoading(true);
         try {
             const user = await register({ name, email, password });
@@ -96,7 +100,12 @@ const Register = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required
-                                    className="w-full h-14 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 rounded-2xl px-12 text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-zinc-800 outline-none focus:border-indigo-500/50 transition-all font-sans"
+                                    minLength={6}
+                                    className={`w-full h-14 bg-white dark:bg-white/[0.02] border rounded-2xl px-12 text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-zinc-800 outline-none focus:border-indigo-500/50 transition-all font-sans ${
+                                        password.length > 0 && password.length < 6
+                                            ? 'border-red-400 dark:border-red-500/50'
+                                            : 'border-slate-200 dark:border-white/10'
+                                    }`}
                                 />
                                 <button
                                     type="button"
@@ -106,6 +115,11 @@ const Register = () => {
                                     {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                 </button>
                             </div>
+                            {password.length > 0 && password.length < 6 && (
+                                <p className="text-xs text-red-400 font-semibold ml-1 mt-1">
+                                    Password must be at least 6 characters ({6 - password.length} more needed)
+                                </p>
+                            )}
                         </div>
 
                         <button

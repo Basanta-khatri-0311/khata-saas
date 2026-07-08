@@ -21,7 +21,12 @@ const translations = {
         chooseCustomer: '-- Choose Customer --',
         fullName: 'Full Name',
         quickEntry: 'Quick Entry',
-        recordNew: 'Record a new transaction'
+        recordNew: 'Record a new transaction',
+        recurring: 'Recurring',
+        repeatEvery: 'Repeats Every',
+        daily: 'Daily',
+        weekly: 'Weekly',
+        monthly: 'Monthly',
     },
     ne: {
         receipt: 'रसिद (आम्दानी)',
@@ -41,7 +46,12 @@ const translations = {
         chooseCustomer: '-- ग्राहक छान्नुहोस् --',
         fullName: 'पुरा नाम',
         quickEntry: 'द्रुत प्रविष्टि',
-        recordNew: 'नयाँ कारोबार रेकर्ड गर्नुहोस्'
+        recordNew: 'नयाँ कारोबार रेकर्ड गर्नुहोस्',
+        recurring: 'दोहोरिने',
+        repeatEvery: 'दोहोर्याउने क्रम',
+        daily: 'दैनिक',
+        weekly: 'साप्ताहिक',
+        monthly: 'मासिक',
     }
 };
 
@@ -63,7 +73,9 @@ const TransactionForm = ({
     customerPhone,
     setCustomerPhone,
     debtors = [],
-    isModal = false 
+    isModal = false,
+    recurrence,
+    setRecurrence,
 }) => {
     const { settings } = useSettings();
     const categories = (type === 'sale' || type === 'udharo_sale') ? (settings?.incomeCategories || []) : (settings?.expenseCategories || []);
@@ -294,6 +306,47 @@ const TransactionForm = ({
                     </button>
                 </div>
             </div>
+
+            {/* Recurring Transaction Toggle */}
+            {setRecurrence && (
+                <div className="flex flex-col gap-3 p-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">{t.recurring}</p>
+                            <p className="text-[10px] text-slate-400 dark:text-gray-500 mt-0.5">Auto-repeat this transaction</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setRecurrence(recurrence === 'none' ? 'monthly' : 'none')}
+                            className={`w-12 h-6 rounded-full transition-all relative ${
+                                recurrence !== 'none' ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-white/10'
+                            }`}
+                        >
+                            <span className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${
+                                recurrence !== 'none' ? 'left-6' : 'left-0.5'
+                            }`} />
+                        </button>
+                    </div>
+                    {recurrence !== 'none' && (
+                        <div className="flex gap-2 animate-in fade-in duration-200">
+                            {['daily', 'weekly', 'monthly'].map(r => (
+                                <button
+                                    key={r}
+                                    type="button"
+                                    onClick={() => setRecurrence(r)}
+                                    className={`flex-1 py-2 text-[10px] font-black rounded-xl uppercase tracking-wider transition-all ${
+                                        recurrence === r
+                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                            : 'bg-white dark:bg-white/5 text-slate-500 dark:text-gray-400 border border-slate-200 dark:border-white/10'
+                                    }`}
+                                >
+                                    {t[r]}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             <button
                 type="submit"

@@ -4,29 +4,37 @@ const TRANSACTION_TYPES = require("../constants/transactionTypes");
 const createTransaction = async (req, res) => {
     try {
         const { amount, type, category, note, createdAt, customerName, customerPhone } = req.body;
-        // Destructure the required fields from the request body
+
+        // --- Validation ---
+        const parsedAmount = Number(amount);
+        if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
+            return res.status(400).json({ error: 'Amount must be a positive number greater than 0.' });
+        }
+        if (!type) {
+            return res.status(400).json({ error: 'Transaction type is required.' });
+        }
+        const udharoTypes = [TRANSACTION_TYPES.UDHARO_SALE, TRANSACTION_TYPES.UDHARO_PAYMENT];
+        if (udharoTypes.includes(type) && (!customerName || !customerName.trim())) {
+            return res.status(400).json({ error: 'Customer name is required for Udharo transactions.' });
+        }
+        // --- End Validation ---
 
         const transactionData = {
             user: req.user.id,
-            amount,
+            amount: parsedAmount,
             type,
             category: category || "General",
             note,
             customerName,
             customerPhone
         };
-        // Insert custom date for testing/seeding if provided
         if (createdAt) transactionData.createdAt = createdAt;
 
         const transaction = await Transaction.create(transactionData);
-
-        // Create a new transaction using the Transaction model
-
         res.status(201).json(transaction);
-        // Send a response with the created transaction and a 201 status code
 
     } catch (error) {
-        console.error("[CREATE ERROR]", error); // Log full error on server
+        console.error("[CREATE ERROR]", error);
         res.status(400).json({ error: error.message });
     }
 }
@@ -128,10 +136,21 @@ const updateTransaction = async (req, res) => {
         const { id } = req.params;
         const { amount, type, category, note, createdAt, customerName, customerPhone, status } = req.body;
         
+        // --- Validation ---
+        const parsedAmount = Number(amount);
+        if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
+            return res.status(400).json({ error: 'Amount must be a positive number greater than 0.' });
+        }
+        const udharoTypes = [TRANSACTION_TYPES.UDHARO_SALE, TRANSACTION_TYPES.UDHARO_PAYMENT];
+        if (udharoTypes.includes(type) && (!customerName || !customerName.trim())) {
+            return res.status(400).json({ error: 'Customer name is required for Udharo transactions.' });
+        }
+        // --- End Validation ---
+        
         console.log(`[UPDATE] ID: ${id}, User: ${req.user?._id}`);
         
         const updatedData = { 
-            amount: Number(amount), 
+            amount: parsedAmount, 
             type, 
             category: category || "General", 
             note,
