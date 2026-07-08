@@ -1,9 +1,22 @@
-import React from 'react';
-import { ReceiptText, Calendar, TrendingUp, TrendingDown, Trash2, User as UserIcon } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ReceiptText, Calendar, TrendingUp, TrendingDown, Trash2, User as UserIcon, Printer } from 'lucide-react';
+import InvoicePrinter from './InvoicePrinter';
 const formatNPR = (val) =>
     'Rs. ' + Number(val || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit, title = "Recent Ledger" }) => {
+    const [printingTx, setPrintingTx] = useState(null);
+    const printRef = useRef(null);
+
+    // Trigger native print after state updates
+    useEffect(() => {
+        if (printingTx) {
+            setTimeout(() => {
+                window.print();
+                setPrintingTx(null); // Reset after print dialog closes
+            }, 100);
+        }
+    }, [printingTx]);
     
     // Search Functionality Filter
     const filteredTransactions = transactions.filter(tx => {
@@ -112,6 +125,13 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                                     <td className="p-2 sm:p-4 w-24 align-middle text-right px-2 sm:px-4">
                                         <div className="flex items-center justify-end gap-2">
                                             <button
+                                                onClick={() => setPrintingTx(tx)}
+                                                className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-gray-400 opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all active:scale-95 shadow-sm"
+                                                title="Print Invoice"
+                                            >
+                                                <Printer className="w-4 h-4" />
+                                            </button>
+                                            <button
                                                 onClick={() => onEdit(tx)}
                                                 className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-gray-400 opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all active:scale-95 shadow-sm"
                                                 title="Edit entry"
@@ -133,6 +153,9 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                     </tbody>
                 </table>
             </div>
+
+            {/* Invisible Printer Component */}
+            {printingTx && <InvoicePrinter transaction={printingTx} ref={printRef} />}
         </div>
     );
 };

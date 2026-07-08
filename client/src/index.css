@@ -159,3 +159,18 @@ html {
 .duration-1000 {
   animation-duration: 1s;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-only, .print-only * {
+    visibility: visible;
+  }
+  .print-only {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
