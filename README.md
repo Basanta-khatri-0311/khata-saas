@@ -30,6 +30,18 @@ Generate and print professional, localized receipts and invoices instantly from 
 ### 📊 Visual Intelligence Dashboard
 Data-dense analytics using high-frequency engines (powered by MongoDB Aggregation Pipelines) to visualize cash flow, categories, and growth trends without compromising server stability.
 
+### 🤖 Smart Receipt Scanning (OCR)
+AI-powered extraction of totals and merchants from physical receipts using Gemini Flash for blazing fast context-aware data entry.
+
+### 🔄 Recurring Automation
+Scheduled auto-posting for recurring payments, rent, and subscriptions powered by background cron jobs. Never miss logging a fixed expense again.
+
+### 📦 Inventory & Stock Control
+Synchronization of physical stock tracking within the financial ledger ecosystem. Automatically deduct stock on sale and seamlessly add custom unregistered items to inventory on-the-fly.
+
+### 📑 Document Export Engine
+Bulk generation of professional PDF and CSV financial master ledgers with date range filters.
+
 ---
 
 ## 🛠️ Technology Stack
@@ -89,10 +101,6 @@ npm run dev
 We are continually evolving Khata to serve modern business needs. The following enterprise modules are currently in the research and development phase:
 
 * **AI-Driven Financial Insights:** Automated cash-flow forecasting and anomaly detection.
-* **Document Export Engine:** Bulk generation of PDF and CSV financial ledgers for tax purposes.
-* **Smart Receipt Scanning (OCR):** AI-powered extraction of totals and merchants from physical receipts.
-* **Recurring Automation:** Scheduled auto-posting for recurring payments, rent, and subscriptions.
-* **Inventory Control Module:** Synchronization of physical stock tracking within the financial ledger ecosystem.
 
 ---
 
