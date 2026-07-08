@@ -35,7 +35,7 @@ const transactionSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["active", "void"],
+        enum: ["active", "void", "pending"],
         default: "active"
     },
     recurrence: {

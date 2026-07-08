@@ -253,5 +253,32 @@ const getDayBookSummary = async (req, res) => {
     }
 };
 
-module.exports = { createTransaction, getTransactions, getSummary, deleteTransaction, updateTransaction, getDayBookSummary };
+const verifyTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const transaction = await Transaction.findOneAndUpdate(
+            { _id: id, user: req.user.id },
+            { status: 'active' },
+            { new: true }
+        );
+
+        if (!transaction) {
+            return res.status(404).json({ error: "Transaction not found" });
+        }
+
+        res.status(200).json(transaction);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { 
+    createTransaction, 
+    getTransactions, 
+    getSummary,
+    deleteTransaction,
+    updateTransaction,
+    getDayBookSummary,
+    verifyTransaction
+};
 // Export the createTransaction, getTransaction, and getSummary functions to be used in other parts of the application

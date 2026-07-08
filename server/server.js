@@ -7,9 +7,11 @@ const transactionRoute = require("./routes/transactionRoutes");
 const adminRoute = require("./routes/adminRoutes");
 const settingsRoute = require("./routes/settingsRoutes");
 const authRoute = require("./routes/authRoutes");
+const { startCronJobs } = require("./jobs/cronJobs");
 
 dotenv.config();
 connectDB();
+startCronJobs();
 
 const app = express();
 

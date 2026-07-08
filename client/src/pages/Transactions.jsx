@@ -220,6 +220,17 @@ const Transactions = () => {
         }
     };
 
+    const handleVerify = async (id) => {
+        try {
+            await api.put(`/transactions/${id}/verify`);
+            toast.success('Recurring entry verified ✅');
+            await fetchTransactions();
+        } catch (err) {
+            console.error('VERIFY FAILURE:', err);
+            toast.error('Failed to verify entry');
+        }
+    };
+
     const debtors = Object.values(transactions.reduce((acc, tx) => {
         if (!tx.customerName) return acc;
         if (!acc[tx.customerName]) acc[tx.customerName] = { name: tx.customerName, balance: 0, phone: tx.customerPhone || '' };
@@ -336,9 +347,10 @@ const Transactions = () => {
                     transactions={filteredTransactions}
                     searchQuery={searchQuery}
                     loading={loading}
-                    onDelete={openDeleteModal}
+                    onDelete={(id) => { setTransactionToDelete(id); setIsDeleteModalOpen(true); }}
                     onEdit={openEditModal}
-                    title={t.ledgerTitle}
+                    onVerify={handleVerify}
+                    title={lang === 'ne' ? 'सबै कारोबार' : 'Master Ledger'}
                 />
             </div>
 

@@ -6,7 +6,8 @@ const {
     getSummary, 
     deleteTransaction, 
     updateTransaction,
-    getDayBookSummary 
+    getDayBookSummary,
+    verifyTransaction
 } = require("../controllers/transactionController");
 
 const { activeOnly } = require("../middleware/statusMiddleware");
@@ -18,6 +19,7 @@ transactionRoute.get("/", protect, activeOnly, getTransactions);
 transactionRoute.get("/summary", protect, activeOnly, getSummary);
 transactionRoute.get("/daybook", protect, activeOnly, getDayBookSummary);
 transactionRoute.put("/:id", protect, activeOnly, updateTransaction);
+transactionRoute.put("/:id/verify", protect, verifyTransaction);
 transactionRoute.delete("/:id", protect, activeOnly, deleteTransaction);
 
 module.exports = transactionRoute;
