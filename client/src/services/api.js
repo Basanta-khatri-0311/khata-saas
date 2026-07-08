@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({ 
-    baseURL: "https://khata-saas-nwg5.onrender.com/api"
+    baseURL: import.meta.env.VITE_API_URL || "http://localhost:5500/api"
 });
 
 // Add a request interceptor to include the JWT token in all requests

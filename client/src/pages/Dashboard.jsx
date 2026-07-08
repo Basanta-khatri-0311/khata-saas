@@ -4,6 +4,7 @@ import StatsCards from '../components/dashboard/StatsCards';
 import TransactionTable from '../components/dashboard/TransactionTable';
 import TransactionModal from '../components/dashboard/TransactionModal';
 import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
+import AddInventoryPromptModal from '../components/dashboard/AddInventoryPromptModal';
 import api from '../services/api';
 import { Plus, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -63,6 +64,8 @@ const Dashboard = () => {
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [recurrence, setRecurrence] = useState('none');
+    const [saleItems, setSaleItems] = useState([]);
+    const [unregisteredItemsPrompt, setUnregisteredItemsPrompt] = useState([]);
 
     // App State
     const [loading, setLoading] = useState(true);
@@ -134,7 +137,7 @@ const Dashboard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone, recurrence };
+            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone, recurrence, items: saleItems };
 
             let handledOffline = false;
             const saveOffline = async () => {
@@ -199,6 +202,12 @@ const Dashboard = () => {
             } else {
                 await Promise.all([fetchSummary(), fetchTransactions()]);
             }
+
+            const customItems = saleItems.filter(li => li.isCustom);
+            if (customItems.length > 0) {
+                setUnregisteredItemsPrompt(customItems);
+            }
+            
             setIsModalOpen(false);
         } catch (err) {
             console.error('SAVE FAILURE:', err);
@@ -241,6 +250,7 @@ const Dashboard = () => {
         setCustomerName('');
         setCustomerPhone('');
         setRecurrence('none');
+        setSaleItems([]);
         setEditingTransaction(null);
     };
 
@@ -253,6 +263,8 @@ const Dashboard = () => {
         setNote(tx.note);
         setCustomerName(tx.customerName || '');
         setCustomerPhone(tx.customerPhone || '');
+        setRecurrence(tx.recurrence || 'none');
+        setSaleItems(tx.items || []);
         setIsModalOpen(true);
     };
 
@@ -340,6 +352,8 @@ const Dashboard = () => {
                 isEditing={!!editingTransaction}
                 recurrence={recurrence}
                 setRecurrence={setRecurrence}
+                saleItems={saleItems}
+                setSaleItems={setSaleItems}
             />
 
             {/* Delete Confirmation Modal */}
@@ -348,6 +362,12 @@ const Dashboard = () => {
                 onClose={() => { setIsDeleteModalOpen(false); setTransactionToDelete(null); }}
                 onConfirm={handleDelete}
                 submitting={submitting}
+            />
+
+            <AddInventoryPromptModal 
+                isOpen={unregisteredItemsPrompt.length > 0} 
+                onClose={() => setUnregisteredItemsPrompt([])} 
+                items={unregisteredItemsPrompt} 
             />
         </div>
     );

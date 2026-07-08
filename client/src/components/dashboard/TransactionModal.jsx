@@ -41,6 +41,8 @@ const TransactionModal = ({
     isEditing = false,
     recurrence,
     setRecurrence,
+    saleItems,
+    setSaleItems,
 }) => {
     const { settings } = useSettings();
     const lang = settings?.language || 'ne';
@@ -109,6 +111,8 @@ const TransactionModal = ({
                         isModal={true}
                         recurrence={recurrence}
                         setRecurrence={setRecurrence}
+                        saleItems={saleItems}
+                        setSaleItems={setSaleItems}
                     />
                 </div>
             </div>

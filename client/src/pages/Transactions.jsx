@@ -6,6 +6,7 @@ import TransactionTable from '../components/dashboard/TransactionTable';
 import TransactionModal from '../components/dashboard/TransactionModal';
 import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
 import LedgerExporter from '../components/dashboard/LedgerExporter';
+import AddInventoryPromptModal from '../components/dashboard/AddInventoryPromptModal';
 import { isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import { Download, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -74,6 +75,8 @@ const Transactions = () => {
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [recurrence, setRecurrence] = useState('none');
+    const [saleItems, setSaleItems] = useState([]);
+    const [unregisteredItemsPrompt, setUnregisteredItemsPrompt] = useState([]);
 
     useEffect(() => {
         fetchTransactions();
@@ -142,7 +145,7 @@ const Transactions = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone, recurrence };
+            const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone, recurrence, items: saleItems };
 
             let handledOffline = false;
             const saveOffline = async () => {
@@ -193,6 +196,11 @@ const Transactions = () => {
             // We only fetch transactions again if we actually talked to the live server
             if (!handledOffline) {
                 await fetchTransactions();
+            }
+
+            const customItems = saleItems.filter(li => li.isCustom);
+            if (customItems.length > 0) {
+                setUnregisteredItemsPrompt(customItems);
             }
 
             setIsModalOpen(false);
@@ -248,6 +256,7 @@ const Transactions = () => {
         setCustomerName('');
         setCustomerPhone('');
         setRecurrence('none');
+        setSaleItems([]);
         setEditingTransaction(null);
     };
 
@@ -261,6 +270,7 @@ const Transactions = () => {
         setCustomerName(tx.customerName || '');
         setCustomerPhone(tx.customerPhone || '');
         setRecurrence(tx.recurrence || 'none');
+        setSaleItems(tx.items || []);
         setIsModalOpen(true);
     };
 
@@ -375,9 +385,11 @@ const Transactions = () => {
                 customerPhone={customerPhone}
                 setCustomerPhone={setCustomerPhone}
                 debtors={debtors}
-                isEditing={!!editingTransaction}
+                isModal={true}
                 recurrence={recurrence}
                 setRecurrence={setRecurrence}
+                saleItems={saleItems}
+                setSaleItems={setSaleItems}
             />
 
             {/* Delete Confirmation Modal */}
@@ -386,6 +398,12 @@ const Transactions = () => {
                 onClose={() => { setIsDeleteModalOpen(false); setTransactionToDelete(null); }}
                 onConfirm={handleDelete}
                 submitting={submitting}
+            />
+
+            <AddInventoryPromptModal 
+                isOpen={unregisteredItemsPrompt.length > 0} 
+                onClose={() => setUnregisteredItemsPrompt([])} 
+                items={unregisteredItemsPrompt} 
             />
 
             {/* PDF Ledger Exporter — rendered at document root to avoid clipping */}

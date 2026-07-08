@@ -1,9 +1,13 @@
 const Transaction = require("../models/transaction.model");
 const TRANSACTION_TYPES = require("../constants/transactionTypes");
+const Item = require("../models/item.model");
+const { GoogleGenAI } = require("@google/genai");
+
+// Initialize Gemini API (will use GEMINI_API_KEY from environment)
 
 const createTransaction = async (req, res) => {
     try {
-        const { amount, type, category, note, createdAt, customerName, customerPhone } = req.body;
+        const { amount, type, category, note, createdAt, customerName, customerPhone, recurrence, items } = req.body;
 
         // --- Validation ---
         const parsedAmount = Number(amount);
@@ -17,6 +21,22 @@ const createTransaction = async (req, res) => {
         if (udharoTypes.includes(type) && (!customerName || !customerName.trim())) {
             return res.status(400).json({ error: 'Customer name is required for Udharo transactions.' });
         }
+
+        // If items are provided on a sale, validate stock availability before saving
+        if (type === 'sale' && items && items.length > 0) {
+            for (const lineItem of items) {
+                if (!lineItem.itemId) continue; // Skip validation for custom unregistered items
+                const inventoryItem = await Item.findOne({ _id: lineItem.itemId, user: req.user.id });
+                if (!inventoryItem) {
+                    return res.status(400).json({ error: `Item not found: ${lineItem.itemName}` });
+                }
+                if (inventoryItem.stockQuantity < lineItem.quantity) {
+                    return res.status(400).json({ 
+                        error: `Insufficient stock for "${inventoryItem.name}". Available: ${inventoryItem.stockQuantity} ${inventoryItem.unit}` 
+                    });
+                }
+            }
+        }
         // --- End Validation ---
 
         const transactionData = {
@@ -26,11 +46,33 @@ const createTransaction = async (req, res) => {
             category: category || "General",
             note,
             customerName,
-            customerPhone
+            customerPhone,
+            recurrence: recurrence || 'none',
+            items: (type === 'sale' && items && items.length > 0) ? items : []
         };
         if (createdAt) transactionData.createdAt = createdAt;
+        if (recurrence && recurrence !== 'none') {
+            const nextDate = new Date();
+            if (recurrence === 'daily') nextDate.setDate(nextDate.getDate() + 1);
+            else if (recurrence === 'weekly') nextDate.setDate(nextDate.getDate() + 7);
+            else if (recurrence === 'monthly') nextDate.setMonth(nextDate.getMonth() + 1);
+            transactionData.nextDueDate = nextDate;
+        }
 
         const transaction = await Transaction.create(transactionData);
+
+        // Deduct stock for each line item after successful transaction creation
+        if (type === 'sale' && items && items.length > 0) {
+            for (const lineItem of items) {
+                if (lineItem.itemId) {
+                    await Item.findOneAndUpdate(
+                        { _id: lineItem.itemId, user: req.user.id },
+                        { $inc: { stockQuantity: -lineItem.quantity } }
+                    );
+                }
+            }
+        }
+
         res.status(201).json(transaction);
 
     } catch (error) {
@@ -272,6 +314,57 @@ const verifyTransaction = async (req, res) => {
     }
 };
 
+const scanReceipt = async (req, res) => {
+    try {
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ error: "No image provided." });
+        }
+
+        const ai = new GoogleGenAI();
+        
+        // Convert buffer to base64
+        const base64Image = req.file.buffer.toString('base64');
+        const mimeType = req.file.mimetype;
+
+        const prompt = `
+            Analyze this receipt or bill. Extract the following information and return it strictly as a JSON object (no markdown, no extra text):
+            {
+                "amount": (number, the total amount on the receipt),
+                "date": (string in YYYY-MM-DD format, or null if not found),
+                "description": (string, a brief 3-5 word summary of the purchase or vendor name),
+                "type": "expense" // default to expense for receipts
+            }
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: [
+                prompt,
+                {
+                    inlineData: {
+                        data: base64Image,
+                        mimeType: mimeType
+                    }
+                }
+            ]
+        });
+
+        const textResponse = response.text;
+        // Clean up markdown code blocks if the model wrapped it in ```json ... ```
+        const jsonString = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+        const extractedData = JSON.parse(jsonString);
+
+        res.status(200).json(extractedData);
+    } catch (error) {
+        console.error("Receipt Scan Error:", error);
+        res.status(500).json({ error: "Failed to process the receipt image." });
+    }
+};
+
 module.exports = { 
     createTransaction, 
     getTransactions, 
@@ -279,6 +372,7 @@ module.exports = {
     deleteTransaction,
     updateTransaction,
     getDayBookSummary,
-    verifyTransaction
+    verifyTransaction,
+    scanReceipt
 };
 // Export the createTransaction, getTransaction, and getSummary functions to be used in other parts of the application

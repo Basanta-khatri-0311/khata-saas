@@ -130,7 +130,7 @@ const Reports = () => {
                 {/* Historical Monthly Bar Chart - TOP FULL WIDTH */}
                 <div className="md:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-[2rem] shadow-xl shadow-black/5 border border-slate-200 dark:border-white/[0.05] p-10 h-[500px] min-w-0 overflow-hidden">
                     <h3 className="text-sm font-black text-slate-400 border-l-4 border-slate-400 pl-4 mb-10 uppercase tracking-widest">Fiscal Growth Trend</h3>
-                    <ResponsiveContainer width="100%" height="80%">
+                    <ResponsiveContainer width="100%" height={380}>
                         <BarChart data={dataBar}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.05} />
                             <XAxis dataKey="name" tick={{fill: '#6b7280', fontSize: 10, fontWeight: 900}} axisLine={false} tickLine={false} />
@@ -146,9 +146,9 @@ const Reports = () => {
                 {/* Income Categories */}
                 <div className="bg-white dark:bg-[#0a0a0a] rounded-[2rem] shadow-xl shadow-black/5 border border-slate-200 dark:border-white/[0.05] p-6 h-[500px] flex flex-col min-w-0">
                     <h3 className="text-sm font-black text-indigo-500 border-l-4 border-indigo-500 pl-4 mb-6 uppercase tracking-widest">Income Breakdown</h3>
-                    <div className="flex-1 w-full h-full min-h-0 flex justify-center items-center">
+                    <div className="w-full" style={{ height: 380 }}>
                         {dataIncomePie.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" debounce={1}>
+                            <ResponsiveContainer width="100%" height={380} debounce={1}>
                                 <RePieChart>
                                     <Pie 
                                         data={dataIncomePie} 
@@ -183,9 +183,9 @@ const Reports = () => {
                 {/* Expense Categories */}
                 <div className="bg-white dark:bg-[#0a0a0a] rounded-[2rem] shadow-xl shadow-black/5 border border-slate-200 dark:border-white/[0.05] p-6 h-[500px] flex flex-col min-w-0">
                     <h3 className="text-sm font-black text-rose-500 border-l-4 border-rose-500 pl-4 mb-6 uppercase tracking-widest">Expense Distribution</h3>
-                    <div className="flex-1 w-full h-full min-h-0 flex justify-center items-center">
+                    <div className="w-full" style={{ height: 380 }}>
                         {dataExpensePie.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" debounce={1}>
+                            <ResponsiveContainer width="100%" height={380} debounce={1}>
                                 <RePieChart>
                                     <Pie 
                                         data={dataExpensePie} 

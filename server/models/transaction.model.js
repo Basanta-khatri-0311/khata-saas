@@ -47,6 +47,14 @@ const transactionSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    items: [
+        {
+            itemId: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
+            itemName: { type: String },
+            quantity: { type: Number, default: 1 },
+            unitPrice: { type: Number, default: 0 }
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now

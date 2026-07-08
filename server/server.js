@@ -7,6 +7,7 @@ const transactionRoute = require("./routes/transactionRoutes");
 const adminRoute = require("./routes/adminRoutes");
 const settingsRoute = require("./routes/settingsRoutes");
 const authRoute = require("./routes/authRoutes");
+const inventoryRoute = require("./routes/inventoryRoutes");
 const { startCronJobs } = require("./jobs/cronJobs");
 
 dotenv.config();
@@ -31,6 +32,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/transactions", transactionRoute);
 app.use("/api/admin", adminRoute);
 app.use("/api/settings", settingsRoute);
+app.use("/api/inventory", inventoryRoute);
 
 const PORT = process.env.PORT || 5200;
 

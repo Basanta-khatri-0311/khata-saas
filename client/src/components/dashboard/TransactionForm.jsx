@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Mic } from 'lucide-react';
+import { Plus, Mic, Scan, Loader2, ShoppingCart, X, Package } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import api from '../../services/api';
 
 const translations = {
     en: {
@@ -76,6 +77,8 @@ const TransactionForm = ({
     isModal = false,
     recurrence,
     setRecurrence,
+    saleItems,
+    setSaleItems,
 }) => {
     const { settings } = useSettings();
     const categories = (type === 'sale' || type === 'udharo_sale') ? (settings?.incomeCategories || []) : (settings?.expenseCategories || []);
@@ -85,6 +88,122 @@ const TransactionForm = ({
     const today = new Date().toISOString().split('T')[0];
 
     const [isListening, setIsListening] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
+    const [inventoryItems, setInventoryItems] = useState([]);
+    const [selectedItemName, setSelectedItemName] = useState('');
+    const [itemQty, setItemQty] = useState(1);
+    const [itemPrice, setItemPrice] = useState('');
+
+    // Fetch inventory whenever type switches to sale
+    useEffect(() => {
+        if (type === 'sale') {
+            api.get('/inventory').then(res => setInventoryItems(res.data)).catch(() => {});
+        } else {
+            setInventoryItems([]);
+        }
+    }, [type]);
+
+    // Auto-compute amount from saleItems
+    useEffect(() => {
+        if (saleItems && saleItems.length > 0) {
+            const total = saleItems.reduce((sum, li) => sum + li.unitPrice * li.quantity, 0);
+            setAmount(total.toFixed(2));
+        }
+    }, [saleItems, setAmount]);
+
+    const handleItemNameChange = (e) => {
+        const val = e.target.value;
+        setSelectedItemName(val);
+        const inv = inventoryItems.find(i => i.name.toLowerCase() === val.toLowerCase());
+        if (inv) {
+            setItemPrice(inv.sellingPrice);
+        }
+    };
+
+    const handleAddItem = () => {
+        if (!selectedItemName.trim()) return;
+        const qty = Number(itemQty);
+        const price = Number(itemPrice);
+        if (!qty || qty <= 0 || price < 0 || isNaN(price)) return;
+        
+        const inv = inventoryItems.find(i => i.name.toLowerCase() === selectedItemName.trim().toLowerCase());
+        
+        setSaleItems(prev => {
+            const existingId = inv ? inv._id : null;
+            // If it's an existing item, merge by itemId. If custom, merge by itemName
+            if (existingId) {
+                const existing = prev.find(li => li.itemId === existingId);
+                if (existing) {
+                    return prev.map(li => li.itemId === existingId ? { ...li, quantity: li.quantity + qty } : li);
+                }
+                return [...prev, { itemId: existingId, itemName: inv.name, quantity: qty, unitPrice: price, unit: inv.unit, isCustom: false }];
+            } else {
+                const customName = selectedItemName.trim();
+                const existingCustom = prev.find(li => li.itemName.toLowerCase() === customName.toLowerCase() && li.isCustom);
+                if (existingCustom) {
+                    return prev.map(li => (li.itemName.toLowerCase() === customName.toLowerCase() && li.isCustom) ? { ...li, quantity: li.quantity + qty } : li);
+                }
+                return [...prev, { itemId: null, itemName: customName, quantity: qty, unitPrice: price, unit: 'pcs', isCustom: true }];
+            }
+        });
+        
+        setSelectedItemName('');
+        setItemQty(1);
+        setItemPrice('');
+    };
+
+    const handleRemoveItem = (identifier, isCustom) => {
+        setSaleItems(prev => {
+            const updated = prev.filter(li => isCustom ? li.itemName !== identifier : li.itemId !== identifier);
+            if (updated.length === 0) setAmount('');
+            return updated;
+        });
+    };
+
+    const handleScan = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsScanning(true);
+        const formData = new FormData();
+        formData.append('receipt', file);
+
+        try {
+            const token = JSON.parse(localStorage.getItem('userInfo')).token;
+            const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5500/api';
+            const res = await fetch(`${apiBase}/transactions/scan`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!res.ok) throw new Error('Failed to scan receipt');
+
+            const data = await res.json();
+            
+            if (data.amount) setAmount(data.amount);
+            if (data.date) {
+                // simple validation of date format
+                const d = new Date(data.date);
+                if (!isNaN(d)) setDate(d.toISOString().split('T')[0]);
+            }
+            if (data.description) setNote(data.description);
+            if (data.type) {
+                if (data.type === 'expense' || data.type === 'sale') {
+                    setType(data.type);
+                }
+            }
+            toast.success('Receipt scanned successfully!');
+        } catch (error) {
+            console.error('Scan error:', error);
+            toast.error('Failed to process receipt.');
+        } finally {
+            setIsScanning(false);
+            e.target.value = ''; // Reset input
+        }
+    };
 
     const startListening = () => {
         if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
@@ -174,6 +293,106 @@ const TransactionForm = ({
                         }`}
                 >{t.settle}</button>
             </div>
+
+            {/* Smart Scan AI Button */}
+            <div className="flex justify-between items-center -mt-2">
+                <p className="text-[10px] font-medium text-slate-400 dark:text-gray-500 italic">Have a receipt?</p>
+                <button
+                    type="button"
+                    onClick={() => document.getElementById('receipt-upload').click()}
+                    disabled={isScanning}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all active:scale-95 disabled:opacity-50"
+                >
+                    {isScanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Scan className="w-3.5 h-3.5" />}
+                    {isScanning ? 'Scanning...' : 'Smart Scan AI'}
+                </button>
+                <input
+                    type="file"
+                    id="receipt-upload"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={handleScan}
+                />
+            </div>
+
+            {/* Amount Input */}
+            {/* Inventory Line Items — only for Sale */}
+            {type === 'sale' && (
+                <div className="flex flex-col gap-3 p-4 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-2xl">
+                    <div className="flex items-center gap-2 mb-1">
+                        <ShoppingCart className="w-3.5 h-3.5 text-indigo-500" />
+                        <p className="text-[10px] font-black text-slate-600 dark:text-white uppercase tracking-widest">Add Items</p>
+                    </div>
+
+                    {/* Item Selector Row */}
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            list="inventory-list"
+                            placeholder="Item name..."
+                            value={selectedItemName}
+                            onChange={handleItemNameChange}
+                            className="flex-1 min-w-0 h-10 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 text-xs font-medium text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-all"
+                        />
+                        <datalist id="inventory-list">
+                            {inventoryItems.map(inv => (
+                                <option key={inv._id} value={inv.name}>
+                                    Rs.{inv.sellingPrice} ({inv.stockQuantity} {inv.unit})
+                                </option>
+                            ))}
+                        </datalist>
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="Price"
+                            value={itemPrice}
+                            onChange={e => setItemPrice(e.target.value)}
+                            className="w-20 shrink-0 h-10 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-2 text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-all"
+                        />
+                        <input
+                            type="number"
+                            min="1"
+                            value={itemQty}
+                            onChange={e => setItemQty(e.target.value)}
+                            className="w-16 shrink-0 h-10 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-2 text-xs font-bold text-center text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-all"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleAddItem}
+                            disabled={!selectedItemName.trim() || !itemPrice}
+                            className="h-10 px-3 shrink-0 rounded-xl bg-indigo-600 text-white text-xs font-black hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-40"
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Line Items List */}
+                    {saleItems && saleItems.length > 0 && (
+                        <div className="flex flex-col gap-1.5 mt-1">
+                            {saleItems.map(li => (
+                                <div key={li.itemId} className="flex items-center justify-between bg-white dark:bg-white/5 border border-slate-200 dark:border-white/[0.08] rounded-xl px-3 py-2">
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-bold text-slate-900 dark:text-white">{li.itemName}</span>
+                                        <span className="text-[10px] text-slate-400 dark:text-gray-500">{li.quantity} × Rs.{li.unitPrice}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">Rs.{(li.quantity * li.unitPrice).toLocaleString()}</span>
+                                        <button type="button" onClick={() => handleRemoveItem(li.isCustom ? li.itemName : li.itemId, li.isCustom)} className="text-slate-400 hover:text-rose-500 transition-colors">
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            <div className="flex justify-between items-center pt-1 border-t border-slate-100 dark:border-white/5 mt-1">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Total</span>
+                                <span className="text-sm font-black text-slate-900 dark:text-white">Rs.{saleItems.reduce((s, li) => s + li.unitPrice * li.quantity, 0).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Amount Input */}
             <div className="flex flex-col gap-1.5">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight, Settings as SettingsIcon, LogOut, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Wallet, X, ChevronLeft, ChevronRight, Settings as SettingsIcon, LogOut, ShieldCheck, Package } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -9,6 +9,7 @@ const translations = {
         dashboard: 'Dashboard',
         transactions: 'Transactions',
         udharo: 'Udharo',
+        inventory: 'Inventory',
         reports: 'Reports',
         settings: 'Settings',
         admin: 'Admin Panel',
@@ -19,6 +20,7 @@ const translations = {
         dashboard: 'ड्यासबोर्ड',
         transactions: 'कारोबारहरू',
         udharo: 'उधारो खाता',
+        inventory: 'स्टक',
         reports: 'रिपोर्टहरू',
         settings: 'सेटिङहरू',
         admin: 'एडमिन प्यानल',
@@ -38,6 +40,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { label: t.dashboard, path: '/dashboard', icon: LayoutDashboard },
         { label: t.transactions, path: '/transactions', icon: ReceiptText },
         { label: t.udharo, path: '/udharo', icon: Wallet },
+        { label: t.inventory, path: '/inventory', icon: Package },
         { label: t.reports, path: '/reports', icon: PieChart },
         { label: t.settings, path: '/settings', icon: SettingsIcon },
     ];
