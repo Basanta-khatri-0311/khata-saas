@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ReceiptText, Calendar, TrendingUp, TrendingDown, Trash2, User as UserIcon, Printer } from 'lucide-react';
 import InvoicePrinter from './InvoicePrinter';
 const formatNPR = (val) =>
@@ -154,8 +155,11 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                 </table>
             </div>
 
-            {/* Invisible Printer Component */}
-            {printingTx && <InvoicePrinter transaction={printingTx} ref={printRef} />}
+            {/* Invisible Printer Component rendered at root to avoid clipping */}
+            {printingTx && typeof document !== 'undefined' && createPortal(
+                <InvoicePrinter transaction={printingTx} ref={printRef} />, 
+                document.body
+            )}
         </div>
     );
 };

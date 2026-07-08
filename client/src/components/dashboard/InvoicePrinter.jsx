@@ -4,10 +4,9 @@ import { useSettings } from '../../context/SettingsContext';
 const translations = {
     en: {
         invoice: 'TRANSACTION RECEIPT',
-        company: 'Khata SaaS',
         date: 'Date',
         txnId: 'Txn ID',
-        customer: 'Customer Details',
+        customer: 'Billed To',
         name: 'Name',
         phone: 'Phone',
         details: 'Transaction Details',
@@ -20,7 +19,6 @@ const translations = {
     },
     ne: {
         invoice: 'कारोबार रसिद',
-        company: 'खाता SaaS',
         date: 'मिति',
         txnId: 'कारोबार आईडी',
         customer: 'ग्राहकको विवरण',
@@ -62,36 +60,41 @@ const InvoicePrinter = React.forwardRef(({ transaction }, ref) => {
     }
 
     return (
-        <div ref={ref} className="print-only fixed inset-0 bg-white z-[9999] p-10 font-sans text-black">
-            <div className="max-w-3xl mx-auto border border-gray-300 p-8 rounded-lg shadow-sm">
+        <div ref={ref} className="print-only fixed inset-0 bg-white z-[9999] p-4 sm:p-10 font-sans text-black overflow-visible">
+            <div className="max-w-4xl mx-auto p-4 sm:p-8">
                 
                 {/* Header */}
-                <div className="flex justify-between items-start border-b border-gray-300 pb-6 mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-gray-800 pb-6 mb-8 gap-4">
                     <div>
-                        <h1 className="text-3xl font-black uppercase tracking-wider">{t.company}</h1>
-                        <p className="text-gray-500 mt-1 text-sm font-medium">{t.invoice}</p>
+                        <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-wider text-gray-900">
+                            {settings?.businessName || 'Khata SaaS'}
+                        </h1>
+                        <p className="text-gray-500 mt-1 text-sm font-semibold tracking-wide">
+                            {settings?.businessSubtitle || 'Digital Ledger System'}
+                        </p>
                     </div>
-                    <div className="text-right">
-                        <p className="font-bold text-sm">
-                            <span className="text-gray-500 uppercase text-xs mr-2">{t.date}:</span> 
+                    <div className="text-left sm:text-right">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 uppercase tracking-widest mb-2">{t.invoice}</h2>
+                        <p className="font-semibold text-sm text-gray-600">
+                            <span className="uppercase text-xs mr-2">{t.date}:</span> 
                             {displayDate}
                         </p>
-                        <p className="font-bold text-sm mt-1">
-                            <span className="text-gray-500 uppercase text-xs mr-2">{t.txnId}:</span> 
+                        <p className="font-semibold text-sm text-gray-600 mt-1">
+                            <span className="uppercase text-xs mr-2">{t.txnId}:</span> 
                             {transaction._id.substring(0, 8).toUpperCase()}
                         </p>
                     </div>
                 </div>
 
                 {/* Body */}
-                <div className="grid grid-cols-2 gap-8 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
                     {/* Customer Info */}
-                    <div>
-                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{t.customer}</h3>
+                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 border-b border-gray-200 pb-2">{t.customer}</h3>
                         {transaction.customerName ? (
-                            <div className="space-y-1">
-                                <p className="font-bold">{transaction.customerName}</p>
-                                {transaction.customerPhone && <p className="text-gray-600">{transaction.customerPhone}</p>}
+                            <div className="space-y-2">
+                                <p className="font-bold text-lg text-gray-900">{transaction.customerName}</p>
+                                {transaction.customerPhone && <p className="text-gray-600 font-medium">{transaction.customerPhone}</p>}
                             </div>
                         ) : (
                             <p className="text-gray-500 italic">N/A</p>
@@ -99,39 +102,39 @@ const InvoicePrinter = React.forwardRef(({ transaction }, ref) => {
                     </div>
 
                     {/* Transaction Info */}
-                    <div>
-                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{t.details}</h3>
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between border-b border-gray-100 pb-1">
-                                <span className="text-gray-500">{t.type}:</span>
-                                <span className="font-bold">{displayType}</span>
+                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 border-b border-gray-200 pb-2">{t.details}</h3>
+                        <div className="space-y-3 text-sm">
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-500 font-medium">{t.type}:</span>
+                                <span className="font-bold text-gray-900 px-2 py-1 bg-white rounded border border-gray-200">{displayType}</span>
                             </div>
-                            <div className="flex justify-between border-b border-gray-100 pb-1">
-                                <span className="text-gray-500">{t.category}:</span>
-                                <span className="font-bold">{transaction.category || 'General'}</span>
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-500 font-medium">{t.category}:</span>
+                                <span className="font-bold text-gray-900">{transaction.category || 'General'}</span>
                             </div>
-                            <div className="flex justify-between border-b border-gray-100 pb-1">
-                                <span className="text-gray-500">{t.note}:</span>
-                                <span className="font-bold">{transaction.note || '-'}</span>
+                            <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                                <span className="text-gray-500 font-medium">{t.note}:</span>
+                                <span className="font-bold text-gray-900 text-right max-w-[200px] break-words">{transaction.note || '-'}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Amount Row */}
-                <div className="flex justify-end border-t border-b border-gray-300 py-4 mb-16">
-                    <div className="flex items-center gap-6">
-                        <span className="text-sm font-black text-gray-400 uppercase tracking-widest">{t.amount}</span>
-                        <span className="text-3xl font-black">{formatNPR(transaction.amount)}</span>
+                <div className="flex justify-end items-center bg-gray-900 text-white p-6 rounded-lg mb-16 shadow-inner">
+                    <div className="flex items-center gap-8">
+                        <span className="text-sm font-bold uppercase tracking-widest text-gray-300">{t.amount}</span>
+                        <span className="text-4xl font-black tracking-tight">{formatNPR(transaction.amount)}</span>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-between items-end mt-20">
+                <div className="flex justify-between items-end pt-10 border-t-2 border-gray-100">
                     <p className="text-sm font-bold text-gray-400 italic">{t.thankYou}</p>
-                    <div className="text-center w-48">
-                        <div className="border-b-2 border-black mb-2 h-10"></div>
-                        <p className="text-xs font-bold uppercase tracking-widest">{t.signature}</p>
+                    <div className="text-center w-56">
+                        <div className="border-b-2 border-gray-800 mb-3 h-12"></div>
+                        <p className="text-xs font-bold text-gray-600 uppercase tracking-widest">{t.signature}</p>
                     </div>
                 </div>
 
