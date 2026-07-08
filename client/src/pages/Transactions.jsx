@@ -98,7 +98,7 @@ const Transactions = () => {
             if (navigator.onLine) {
                 try {
                     const res = await api.get('/transactions');
-                    serverData = res.data;
+                    serverData = res.data.data || res.data;
                 } catch (err) {
                     console.error('Failed to fetch from server', err);
                 }

@@ -33,11 +33,23 @@ const createTransaction = async (req, res) => {
 
 const getTransactions = async (req, res) => {
     try {
-        const transactions = await Transaction.find({ user: req.user.id }).sort({ createdAt: -1 });
-        // Retrieve all transactions from the database using the Transaction model and sort them in descending order based on the createdAt field
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 100; // Increased limit to not break things too much
+        const skip = (page - 1) * limit;
 
-        res.status(200).json(transactions);
-        // Send a response with the retrieved transactions and a 200 status code
+        const transactions = await Transaction.find({ user: req.user.id })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Transaction.countDocuments({ user: req.user.id });
+
+        res.status(200).json({
+            data: transactions,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            totalTransactions: total
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -45,35 +57,67 @@ const getTransactions = async (req, res) => {
 
 const getSummary = async (req, res) => {
     try {
-        const transactions = await Transaction.find({ user: req.user.id });
-
-        let totalSales = 0;
-        let totalExpenses = 0;
-        let totalUdharo = 0;
-
-        transactions.forEach((tx) => {
-            if (tx.status === 'void') return;
-            
-            if (tx.type === TRANSACTION_TYPES.SALE) {
-                totalSales += tx.amount;
-            } else if (tx.type === TRANSACTION_TYPES.EXPENSE) {
-                totalExpenses += tx.amount;
-            } else if (tx.type === TRANSACTION_TYPES.UDHARO_SALE) {
-                totalUdharo += tx.amount;
-            } else if (tx.type === TRANSACTION_TYPES.UDHARO_PAYMENT) {
-                totalUdharo -= tx.amount;
-                totalSales += tx.amount; // When they pay back, it's actual income
+        const mongoose = require('mongoose');
+        const summary = await Transaction.aggregate([
+            { 
+                $match: { 
+                    user: new mongoose.Types.ObjectId(req.user.id),
+                    status: { $ne: 'void' }
+                } 
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalSales: {
+                        $sum: {
+                            $cond: [
+                                { $in: ["$type", [TRANSACTION_TYPES.SALE, TRANSACTION_TYPES.UDHARO_PAYMENT]] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    },
+                    totalExpenses: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", TRANSACTION_TYPES.EXPENSE] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    },
+                    totalUdharoSale: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", TRANSACTION_TYPES.UDHARO_SALE] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    },
+                    totalUdharoPayment: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", TRANSACTION_TYPES.UDHARO_PAYMENT] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    }
+                }
             }
-        });
+        ]);
 
-        const profit = totalSales - totalExpenses;
+        const data = summary[0] || { totalSales: 0, totalExpenses: 0, totalUdharoSale: 0, totalUdharoPayment: 0 };
+        const totalUdharo = data.totalUdharoSale - data.totalUdharoPayment;
+        const profit = data.totalSales - data.totalExpenses;
 
         res.status(200).json({
-            totalSales,
-            totalExpenses,
-            totalUdharo,
-            profit
-        })
+            totalSales: data.totalSales,
+            totalExpenses: data.totalExpenses,
+            totalUdharo: totalUdharo,
+            profit: profit
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -143,25 +187,48 @@ const getDayBookSummary = async (req, res) => {
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
 
-        const transactions = await Transaction.find({
-            user: req.user.id,
-            createdAt: { $gte: startOfDay, $lte: endOfDay }
-        });
+        const mongoose = require('mongoose');
+        const summary = await Transaction.aggregate([
+            { 
+                $match: { 
+                    user: new mongoose.Types.ObjectId(req.user.id),
+                    createdAt: { $gte: startOfDay, $lte: endOfDay },
+                    status: { $ne: 'void' }
+                } 
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalSales: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", TRANSACTION_TYPES.SALE] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    },
+                    totalExpenses: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", TRANSACTION_TYPES.EXPENSE] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    }
+                }
+            }
+        ]);
 
-        let totalSales = 0;
-        let totalExpenses = 0;
-
-        transactions.forEach((tx) => {
-            if (tx.type === TRANSACTION_TYPES.SALE) totalSales += tx.amount;
-            else if (tx.type === TRANSACTION_TYPES.EXPENSE) totalExpenses += tx.amount;
-        });
+        const data = summary[0] || { totalSales: 0, totalExpenses: 0 };
+        const profit = data.totalSales - data.totalExpenses;
 
         res.status(200).json({
-            totalSales,
-            totalExpenses,
-            profit: totalSales - totalExpenses,
+            totalSales: data.totalSales,
+            totalExpenses: data.totalExpenses,
+            profit: profit,
         });
-
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
