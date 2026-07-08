@@ -18,6 +18,15 @@ body {
 /* Prevent layout shift when scrollbar disappears */
 html {
   scrollbar-gutter: stable;
+  background-color: #f8fafc; /* slate-50 — matches light mode page bg */
+}
+
+html.dark {
+  background-color: #050505; /* matches dark mode page bg */
+}
+
+body {
+  background-color: inherit;
 }
 
 /* Modal Open State */

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Wallet, Shield, PieChart, FileText, ArrowRight, Sun, Moon, Zap, UserPlus, Layers, Globe, Activity } from 'lucide-react';
+import { Wallet, Shield, PieChart, FileText, ArrowRight, Sun, Moon, Zap, UserPlus, Layers, Globe, Activity, WifiOff, Languages, CreditCard, Package, Repeat, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const LandingPage = () => {
@@ -45,6 +45,8 @@ const LandingPage = () => {
                     >
                         {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                     </button>
+                    <a href="#features" className="hidden sm:block text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-black dark:hover:text-white transition-colors">Features</a>
+                    <a href="#analytics" className="hidden sm:block text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-black dark:hover:text-white transition-colors">Analytics</a>
                     <Link to="/login" className="hidden sm:block text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-black dark:hover:text-white transition-colors">Sign In</Link>
                     <Link to="/register" className="h-10 px-5 bg-black dark:bg-white text-white dark:text-black rounded-lg text-[10px] font-bold uppercase tracking-[0.1em] flex items-center gap-2 hover:opacity-80 transition-all">
                         Get Started
@@ -55,7 +57,7 @@ const LandingPage = () => {
             {/* Clean Hero System */}
             <motion.section 
                 {...fadeInUp}
-                className="sm:pt-56 pt-40 pb-32 px-6 sm:px-16 max-w-7xl mx-auto flex flex-col items-start text-left relative z-10"
+                className="sm:pt-30 pt-40 pb-32 px-6 sm:px-16 max-w-7xl mx-auto flex flex-col items-start text-left relative z-10"
             >
                 <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.85] mb-12 max-w-4xl italic">
                     Industrial <br /> Financial <br /> Ledger.
@@ -73,13 +75,15 @@ const LandingPage = () => {
             </motion.section>
 
             {/* Features Expanded Specification */}
-            <section className="px-6 sm:px-16 py-32 border-t border-slate-100 dark:border-white/[0.05] relative z-10">
+            <section id="features" className="px-6 sm:px-16 py-32 border-t border-slate-100 dark:border-white/[0.05] relative z-10">
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-16 sm:gap-24">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 sm:gap-24">
 
                         {/* Feature 01: Offline Sync */}
                         <motion.div {...fadeInUp} className="space-y-6">
-                            <h3 className="text-3xl font-black tracking-tighter uppercase italic text-indigo-500">Offline Sync</h3>
+                            <h3 className="flex items-center gap-3 text-3xl font-black tracking-tighter uppercase italic text-indigo-500">
+                                <WifiOff className="w-8 h-8" /> Offline Sync
+                            </h3>
                             <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed">
                                 Record transactions without internet. Our system buffers ledger entries and synchronizes instantly when you're back online.
                             </p>
@@ -94,7 +98,9 @@ const LandingPage = () => {
 
                         {/* Feature 02: Bilingual Support */}
                         <motion.div {...fadeInUp} transition={{ delay: 0.1, duration: 0.8 }} className="space-y-6">
-                            <h3 className="text-3xl font-black tracking-tighter uppercase italic text-emerald-500">Bilingual Ops</h3>
+                            <h3 className="flex items-center gap-3 text-3xl font-black tracking-tighter uppercase italic text-emerald-500">
+                                <Languages className="w-8 h-8" /> Bilingual Ops
+                            </h3>
                             <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed">
                                 Native support for English and Nepali. Switching languages updates every report, invoice, and interface label instantly.
                             </p>
@@ -109,7 +115,9 @@ const LandingPage = () => {
 
                         {/* Feature 03: Udharo Management */}
                         <motion.div {...fadeInUp} transition={{ delay: 0.2, duration: 0.8 }} className="space-y-6">
-                            <h3 className="text-3xl font-black tracking-tighter uppercase italic text-amber-500">Udharo Control</h3>
+                            <h3 className="flex items-center gap-3 text-3xl font-black tracking-tighter uppercase italic text-amber-500">
+                                <CreditCard className="w-8 h-8" /> Udharo Control
+                            </h3>
                             <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed">
                                 Advanced credit tracking with automated balance reconciliation. Monitor payments and manage accounts with surgical precision.
                             </p>
@@ -122,17 +130,68 @@ const LandingPage = () => {
                             </ul>
                         </motion.div>
 
+                        {/* Feature 04: Inventory Management */}
+                        <motion.div {...fadeInUp} transition={{ delay: 0.3, duration: 0.8 }} className="space-y-6">
+                            <h3 className="flex items-center gap-3 text-3xl font-black tracking-tighter uppercase italic text-blue-500">
+                                <Package className="w-8 h-8" /> Inventory Control
+                            </h3>
+                            <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed">
+                                Real-time stock tracking with full CRUD capabilities. Maintain product catalogs and get instant alerts for low inventory.
+                            </p>
+                            <ul className="space-y-3">
+                                {['Stock Tracking', 'Alert System', 'Product Catalog'].map(f => (
+                                    <li key={f} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> {f}
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+
+                        {/* Feature 05: Recurring Ledgers */}
+                        <motion.div {...fadeInUp} transition={{ delay: 0.4, duration: 0.8 }} className="space-y-6">
+                            <h3 className="flex items-center gap-3 text-3xl font-black tracking-tighter uppercase italic text-fuchsia-500">
+                                <Repeat className="w-8 h-8" /> Recurring Ledgers
+                            </h3>
+                            <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed">
+                                Automate routine entries with precise cron schedules. Review and verify scheduled transactions before they hit the books.
+                            </p>
+                            <ul className="space-y-3">
+                                {['Cron Schedules', 'Auto-drafts', 'Verification Flow'].map(f => (
+                                    <li key={f} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" /> {f}
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+
+                        {/* Feature 06: Advanced Analytics & AI Insights */}
+                        <motion.div {...fadeInUp} transition={{ delay: 0.5, duration: 0.8 }} className="space-y-6">
+                            <h3 className="flex items-center gap-3 text-3xl font-black tracking-tighter uppercase italic text-rose-500">
+                                <BrainCircuit className="w-8 h-8" /> AI Driven Insights
+                            </h3>
+                            <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed">
+                                Harness advanced analytics and AI intelligence to decode financial patterns, predict cash flow, and optimize operations.
+                            </p>
+                            <ul className="space-y-3">
+                                {['Pattern Analysis', 'Cashflow Predict', 'AI Intelligence'].map(f => (
+                                    <li key={f} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {f}
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+
                     </div>
                 </div>
             </section>
 
             {/* Analytical & Visual System */}
-            <section className="px-6 sm:px-16 py-32 bg-white/30 dark:bg-white/[0.01] border-y border-slate-100 dark:border-white/[0.05] relative z-10 backdrop-blur-sm">
+            <section id="analytics" className="px-6 sm:px-16 py-32 bg-white/30 dark:bg-white/[0.01] border-y border-slate-100 dark:border-white/[0.05] relative z-10 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto flex flex-col lg:row items-center justify-between gap-16">
                     <motion.div {...fadeInUp} className="max-w-xl">
                         <h2 className="text-5xl font-black tracking-tighter uppercase mb-6 italic">Visual Intelligence</h2>
                         <p className="text-slate-500 dark:text-zinc-500 font-medium leading-relaxed mb-8">
-                            Transform yours raw ledger data into actionable insight. Our high-frequency data engine generates real-time income and expense distribution charts instantly.
+                            Transform your raw ledger data into actionable insight. Our high-frequency data engine generates real-time income and expense distribution charts instantly.
                         </p>
                         <div className="flex items-center gap-8">
                             <div className="flex flex-col">
