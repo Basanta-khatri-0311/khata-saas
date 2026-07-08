@@ -18,14 +18,14 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
             }, 100);
         }
     }, [printingTx]);
-    
+
     // Search Functionality Filter
     const filteredTransactions = transactions.filter(tx => {
         if (!searchQuery) return true;
         const query = searchQuery.toLowerCase();
-        return (tx.note && tx.note.toLowerCase().includes(query)) || 
-               (tx.amount && tx.amount.toString().includes(query)) ||
-               (tx.type && tx.type.toLowerCase().includes(query));
+        return (tx.note && tx.note.toLowerCase().includes(query)) ||
+            (tx.amount && tx.amount.toString().includes(query)) ||
+            (tx.type && tx.type.toLowerCase().includes(query));
     });
 
     return (
@@ -80,8 +80,8 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                             </tr>
                         )}
                         {!loading && filteredTransactions.length > 0 && filteredTransactions.map((tx) => {
-                            const displayDate = tx.createdAt 
-                                ? new Date(tx.createdAt).toLocaleDateString() 
+                            const displayDate = tx.createdAt
+                                ? new Date(tx.createdAt).toLocaleDateString()
                                 : 'N/A';
 
                             const isSale = tx.type === 'sale';
@@ -137,7 +137,7 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
                                                 className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-gray-400 opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all active:scale-95 shadow-sm"
                                                 title="Edit entry"
                                             >
-                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                                             </button>
                                             <button
                                                 onClick={() => onDelete(tx._id)}
@@ -157,7 +157,7 @@ const TransactionTable = ({ transactions, searchQuery, loading, onDelete, onEdit
 
             {/* Invisible Printer Component rendered at root to avoid clipping */}
             {printingTx && typeof document !== 'undefined' && createPortal(
-                <InvoicePrinter transaction={printingTx} ref={printRef} />, 
+                <InvoicePrinter transaction={printingTx} ref={printRef} />,
                 document.body
             )}
         </div>

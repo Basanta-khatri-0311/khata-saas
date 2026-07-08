@@ -64,7 +64,7 @@ const Transactions = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [transactionToDelete, setTransactionToDelete] = useState(null);
     const [editingTransaction, setEditingTransaction] = useState(null);
-    
+
     // Form field states
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('sale');
@@ -119,7 +119,7 @@ const Transactions = () => {
                     console.error('Failed to fetch from server', err);
                 }
             }
-            
+
             // Also load any pending offline transactions
             try {
                 const offlineTxs = await getTransactionsToSync();
@@ -133,8 +133,8 @@ const Transactions = () => {
                 console.error("Failed to load offline txs", err);
                 setTransactions(serverData);
             }
-        } finally { 
-            setLoading(false); 
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -143,7 +143,7 @@ const Transactions = () => {
         setSubmitting(true);
         try {
             const payload = { amount, type, category, note, createdAt: date, customerName, customerPhone, recurrence };
-            
+
             let handledOffline = false;
             const saveOffline = async () => {
                 if (editingTransaction) {
@@ -155,7 +155,7 @@ const Transactions = () => {
                         await addTransactionToSync(payload);
                         toast.success('Saved Offline. Will sync when connected 📶');
                         handledOffline = true;
-                        
+
                         // Directly update state bypassing any network fetch
                         setTransactions(prev => [{ ...payload, _id: tempId, isOffline: true }, ...prev]);
                     } catch (dbErr) {
@@ -187,16 +187,16 @@ const Transactions = () => {
                     }
                 }
             }
-            
+
             resetForm();
-            
+
             // We only fetch transactions again if we actually talked to the live server
             if (!handledOffline) {
-               await fetchTransactions(); 
+                await fetchTransactions();
             }
-            
+
             setIsModalOpen(false);
-        } catch (err) { 
+        } catch (err) {
             console.error('SAVE FAILURE:', err);
             toast.error(err?.response?.data?.error || 'Failed to save changes. Please try again.');
         }
@@ -293,9 +293,9 @@ const Transactions = () => {
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">{t.title}</h1>
                     <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t.subtitle}</p>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-3">
-                    <button 
+                    <button
                         onClick={exportToCSV}
                         className="flex items-center gap-2 h-12 px-5 bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95"
                     >
@@ -332,7 +332,7 @@ const Transactions = () => {
             </div>
 
             <div className="flex-1 bg-white dark:bg-[#0a0a0a] rounded-2xl shadow-sm border border-slate-200 dark:border-white/[0.05] overflow-hidden">
-                <TransactionTable 
+                <TransactionTable
                     transactions={filteredTransactions}
                     searchQuery={searchQuery}
                     loading={loading}
@@ -343,7 +343,7 @@ const Transactions = () => {
             </div>
 
             {/* Transaction Modal */}
-            <TransactionModal 
+            <TransactionModal
                 isOpen={isModalOpen}
                 onClose={() => { setIsModalOpen(false); setEditingTransaction(null); }}
                 addTransaction={handleSave}
@@ -369,7 +369,7 @@ const Transactions = () => {
             />
 
             {/* Delete Confirmation Modal */}
-            <DeleteConfirmModal 
+            <DeleteConfirmModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => { setIsDeleteModalOpen(false); setTransactionToDelete(null); }}
                 onConfirm={handleDelete}
@@ -378,11 +378,11 @@ const Transactions = () => {
 
             {/* PDF Ledger Exporter — rendered at document root to avoid clipping */}
             {isPrintingLedger && typeof document !== 'undefined' && createPortal(
-                <LedgerExporter 
+                <LedgerExporter
                     ref={ledgerRef}
-                    transactions={filteredTransactions} 
-                    timeFilter={timeFilter} 
-                />, 
+                    transactions={filteredTransactions}
+                    timeFilter={timeFilter}
+                />,
                 document.body
             )}
         </div>

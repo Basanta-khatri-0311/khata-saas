@@ -30,8 +30,8 @@ const LedgerExporter = React.forwardRef(({ transactions, timeFilter }, ref) => {
         .filter(tx => tx.type === 'udharo_sale')
         .reduce((sum, tx) => sum + (tx.amount || 0), 0) -
         transactions
-        .filter(tx => tx.type === 'udharo_payment')
-        .reduce((sum, tx) => sum + (tx.amount || 0), 0);
+            .filter(tx => tx.type === 'udharo_payment')
+            .reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
     const profit = totalSales - totalExpenses;
 

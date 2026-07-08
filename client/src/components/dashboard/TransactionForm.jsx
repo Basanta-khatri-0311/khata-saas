@@ -307,9 +307,9 @@ const TransactionForm = ({
                 </div>
             </div>
 
-            {/* Recurring Transaction Toggle */}
-            {setRecurrence && (
-                <div className="flex flex-col gap-3 p-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl">
+            {/* Recurring Transaction Toggle - Only for Sales and Expenses */}
+            {(type === 'sale' || type === 'expense') && (
+                <div className="flex flex-col gap-3 p-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl mt-2">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">{t.recurring}</p>
@@ -317,23 +317,23 @@ const TransactionForm = ({
                         </div>
                         <button
                             type="button"
-                            onClick={() => setRecurrence(recurrence === 'none' ? 'monthly' : 'none')}
+                            onClick={() => setRecurrence && setRecurrence(recurrence === 'none' ? 'monthly' : 'none')}
                             className={`w-12 h-6 rounded-full transition-all relative ${
-                                recurrence !== 'none' ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-white/10'
+                                recurrence && recurrence !== 'none' ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-white/10'
                             }`}
                         >
                             <span className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${
-                                recurrence !== 'none' ? 'left-6' : 'left-0.5'
+                                recurrence && recurrence !== 'none' ? 'left-6' : 'left-0.5'
                             }`} />
                         </button>
                     </div>
-                    {recurrence !== 'none' && (
+                    {recurrence && recurrence !== 'none' && (
                         <div className="flex gap-2 animate-in fade-in duration-200">
                             {['daily', 'weekly', 'monthly'].map(r => (
                                 <button
                                     key={r}
                                     type="button"
-                                    onClick={() => setRecurrence(r)}
+                                    onClick={() => setRecurrence && setRecurrence(r)}
                                     className={`flex-1 py-2 text-[10px] font-black rounded-xl uppercase tracking-wider transition-all ${
                                         recurrence === r
                                             ? 'bg-indigo-600 text-white shadow-sm'

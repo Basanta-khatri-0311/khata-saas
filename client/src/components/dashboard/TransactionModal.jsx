@@ -67,7 +67,7 @@ const TransactionModal = ({
             />
 
             {/* Modal Body */}
-            <div className="relative w-full max-w-lg h-full sm:h-auto max-h-screen sm:max-h-[90vh] bg-white dark:bg-[#050505] sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 flex flex-col animate-in fade-in zoom-in duration-300">
+            <div className="relative w-full max-w-[650px] h-full sm:h-auto max-h-screen sm:max-h-[90vh] bg-white dark:bg-[#050505] sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 flex flex-col animate-in fade-in zoom-in duration-300">
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 sm:p-6 pb-2 border-b border-slate-100 dark:border-white/5 shrink-0">
                     <div className="flex flex-col">

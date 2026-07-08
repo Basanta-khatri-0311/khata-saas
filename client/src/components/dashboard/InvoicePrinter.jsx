@@ -44,8 +44,8 @@ const InvoicePrinter = React.forwardRef(({ transaction }, ref) => {
 
     if (!transaction) return null;
 
-    const displayDate = transaction.createdAt 
-        ? new Date(transaction.createdAt).toLocaleDateString() 
+    const displayDate = transaction.createdAt
+        ? new Date(transaction.createdAt).toLocaleDateString()
         : new Date().toLocaleDateString();
 
     const isSale = transaction.type === 'sale';
@@ -62,7 +62,7 @@ const InvoicePrinter = React.forwardRef(({ transaction }, ref) => {
     return (
         <div ref={ref} className="print-only fixed inset-0 bg-white z-[9999] p-4 sm:p-10 font-sans text-black overflow-visible">
             <div className="max-w-4xl mx-auto p-4 sm:p-8">
-                
+
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-gray-800 pb-6 mb-8 gap-4">
                     <div>
@@ -76,11 +76,11 @@ const InvoicePrinter = React.forwardRef(({ transaction }, ref) => {
                     <div className="text-left sm:text-right">
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 uppercase tracking-widest mb-2">{t.invoice}</h2>
                         <p className="font-semibold text-sm text-gray-600">
-                            <span className="uppercase text-xs mr-2">{t.date}:</span> 
+                            <span className="uppercase text-xs mr-2">{t.date}:</span>
                             {displayDate}
                         </p>
                         <p className="font-semibold text-sm text-gray-600 mt-1">
-                            <span className="uppercase text-xs mr-2">{t.txnId}:</span> 
+                            <span className="uppercase text-xs mr-2">{t.txnId}:</span>
                             {transaction._id.substring(0, 8).toUpperCase()}
                         </p>
                     </div>
