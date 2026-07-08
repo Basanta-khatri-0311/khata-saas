@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Plus, Mic } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 
 const translations = {
@@ -71,6 +71,47 @@ const TransactionForm = ({
     const t = translations[lang];
 
     const today = new Date().toISOString().split('T')[0];
+
+    const [isListening, setIsListening] = useState(false);
+
+    const startListening = () => {
+        if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+            alert('Voice recognition is not supported in this browser.');
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = lang === 'ne' ? 'ne-NP' : 'en-US';
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+        recognition.onerror = (e) => {
+            console.error('Speech recognition error', e);
+            setIsListening(false);
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            
+            // Try to extract amount (first number found)
+            const match = transcript.match(/\d+(\.\d+)?/);
+            if (match) {
+                setAmount(match[0]);
+                // Remove the number and clean up
+                let cleanDesc = transcript.replace(match[0], '').trim();
+                // Remove common words like "rupees" or "for" from description if they lead
+                cleanDesc = cleanDesc.replace(/^(rupees|for|को)\s+/i, '').trim();
+                setNote(cleanDesc);
+            } else {
+                setNote(transcript);
+            }
+        };
+
+        recognition.start();
+    };
 
     // Auto-select first category if empty when type changes
     useEffect(() => {
@@ -231,13 +272,27 @@ const TransactionForm = ({
             {/* Description Input */}
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ml-1 text-[10px]">{t.description}</label>
-                <input
-                    type="text"
-                    placeholder={t.descPlaceholder}
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    className="w-full h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-600 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-sans"
-                />
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder={t.descPlaceholder}
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        className="w-full h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 pr-12 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-600 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-sans"
+                    />
+                    <button
+                        type="button"
+                        onClick={startListening}
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all ${
+                            isListening 
+                                ? 'bg-red-500 text-white animate-pulse' 
+                                : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-700 dark:hover:text-gray-200'
+                        }`}
+                        title="Use Voice Input"
+                    >
+                        <Mic className="w-5 h-5" />
+                    </button>
+                </div>
             </div>
 
             <button
