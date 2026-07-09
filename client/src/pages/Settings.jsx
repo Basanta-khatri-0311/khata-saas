@@ -21,7 +21,7 @@ const translations = {
         confirmMessage: 'Are you sure you want to remove this category?',
         confirmBtn: 'Remove Now',
         placeholder: 'Type and press enter...',
-        success: 'System Preferences Saved 🗳️'
+        success: 'System Preferences Saved '
     },
     ne: {
         title: 'प्रणाली सेटिङहरू',
@@ -39,7 +39,7 @@ const translations = {
         confirmMessage: 'के तपाईं पक्का यो वर्ग हटाउन चाहनुहुन्छ?',
         confirmBtn: 'अहिले हटाउनुहोस्',
         placeholder: 'लेख्नुहोस् र इन्टर थिच्नुहोस्...',
-        success: 'प्रणाली प्राथमिकताहरू सुरक्षित गरियो 🗳️'
+        success: 'प्रणाली प्राथमिकताहरू सुरक्षित गरियो '
     }
 };
 

@@ -15,7 +15,7 @@ const createItem = async (req, res) => {
     try {
         const { name, sku, description, sellingPrice, costPrice, stockQuantity, lowStockThreshold, unit } = req.body;
 
-        if (!name || sellingPrice === undefined || sellingPrice === null) {
+        if (!name || sellingPrice === undefined || sellingPrice === null || sellingPrice === '') {
             return res.status(400).json({ error: 'Name and selling price are required.' });
         }
 
@@ -67,14 +67,19 @@ const deleteItem = async (req, res) => {
 const adjustStock = async (req, res) => {
     try {
         const { adjustment, reason } = req.body; // adjustment can be positive or negative
-        if (adjustment === undefined) {
+        if (adjustment === undefined || adjustment === null || adjustment === '') {
             return res.status(400).json({ error: 'Adjustment quantity is required.' });
+        }
+
+        const adjNum = Number(adjustment);
+        if (isNaN(adjNum) || adjNum === 0) {
+            return res.status(400).json({ error: 'Adjustment must be a non-zero number.' });
         }
 
         const item = await Item.findOne({ _id: req.params.id, user: req.user.id });
         if (!item) return res.status(404).json({ error: 'Item not found' });
 
-        const newQty = item.stockQuantity + adjustment;
+        const newQty = item.stockQuantity + adjNum;
         if (newQty < 0) {
             return res.status(400).json({ error: `Cannot reduce stock below 0. Current stock: ${item.stockQuantity}` });
         }
@@ -94,7 +99,7 @@ const getInventorySummary = async (req, res) => {
         const totalItems = items.length;
         const totalStockValue = items.reduce((sum, item) => sum + (item.stockQuantity * item.costPrice), 0);
         const totalRetailValue = items.reduce((sum, item) => sum + (item.stockQuantity * item.sellingPrice), 0);
-        const lowStockItems = items.filter(item => item.stockQuantity <= item.lowStockThreshold);
+        const lowStockItems = items.filter(item => item.stockQuantity > 0 && item.stockQuantity <= item.lowStockThreshold);
         const outOfStockItems = items.filter(item => item.stockQuantity === 0);
 
         res.status(200).json({

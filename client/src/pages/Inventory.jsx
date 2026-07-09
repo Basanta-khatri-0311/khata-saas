@@ -116,7 +116,7 @@ const StockAdjustModal = ({ item, onClose, onAdjust }) => {
 
     const handleSubmit = async (val) => {
         const num = parseInt(val);
-        if (isNaN(num) || num === 0) return toast.error('Enter a valid quantity');
+        if (isNaN(num) || num === 0) return toast.error('Enter a valid non-zero quantity');
         setLoading(true);
         try {
             await onAdjust(item._id, num);
@@ -133,8 +133,14 @@ const StockAdjustModal = ({ item, onClose, onAdjust }) => {
                 <h2 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">Adjust Stock</h2>
                 <p className="text-sm text-slate-500 dark:text-gray-400 mb-5">{item.name} — Current: <span className="font-black text-slate-900 dark:text-white">{item.stockQuantity} {item.unit}</span></p>
                 <div className="flex gap-3 mb-5">
-                    <button onClick={() => setAdjustment(a => a.startsWith('-') ? a.slice(1) : (a ? '+' + a : a))} className="h-10 px-4 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-black text-sm transition-all hover:bg-emerald-200">+ Add</button>
-                    <button onClick={() => setAdjustment(a => a.startsWith('-') ? a : ('-' + a))} className="h-10 px-4 rounded-xl bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 font-black text-sm transition-all hover:bg-rose-200">− Remove</button>
+                    <button onClick={() => setAdjustment(a => {
+                        const n = parseInt(a);
+                        return isNaN(n) ? '' : String(Math.abs(n));
+                    })} className="h-10 px-4 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-black text-sm transition-all hover:bg-emerald-200">+ Add</button>
+                    <button onClick={() => setAdjustment(a => {
+                        const n = parseInt(a);
+                        return isNaN(n) ? '' : String(-Math.abs(n));
+                    })} className="h-10 px-4 rounded-xl bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 font-black text-sm transition-all hover:bg-rose-200">− Remove</button>
                 </div>
                 <input
                     type="number"
