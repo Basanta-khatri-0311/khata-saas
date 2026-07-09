@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import api from '../services/api';
 
-const AuthContext = createContext();
+const AuthContext = createContext<any>(null);
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: any) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const logoutTimerRef = useRef(null);

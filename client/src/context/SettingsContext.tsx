@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from './AuthContext';
 
-const SettingsContext = createContext();
+const SettingsContext = createContext<any>(null);
 
-export const SettingsProvider = ({ children }) => {
+export const SettingsProvider = ({ children }: any) => {
     const { user } = useAuth();
     const [settings, setSettings] = useState({
         businessName: 'Khata',
