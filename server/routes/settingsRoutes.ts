@@ -1,12 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { getSettings, updateSettings } from '../controllers/settingsController';
+import { protect } from '../middleware/authMiddleware';
+import { activeOnly } from '../middleware/statusMiddleware';
+
 const router = express.Router();
-const { getSettings, updateSettings } = require('../controllers/settingsController');
-const { protect } = require('../middleware/authMiddleware');
-const { activeOnly } = require('../middleware/statusMiddleware');
 
 router.get('/', protect, activeOnly, getSettings);
 router.put('/', protect, activeOnly, updateSettings);
 
-module.exports = router;
-
-module.exports = router;
+export default router;

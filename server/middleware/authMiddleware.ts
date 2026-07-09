@@ -1,7 +1,8 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user.model");
+import jwt from "jsonwebtoken";
+import User from "../models/user.model";
+import { Request, Response, NextFunction } from "express";
 
-const protect = async (req, res, next) => {
+export const protect = async (req: any, res: any, next: NextFunction) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
         try {
@@ -9,7 +10,7 @@ const protect = async (req, res, next) => {
             if (!process.env.JWT_SECRET) {
                 throw new Error("FATAL ERROR: JWT_SECRET is not defined.");
             }
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
             const user = await User.findById(decoded.id).select("-password");
             
             if (!user) {
@@ -26,4 +27,4 @@ const protect = async (req, res, next) => {
     }
 };
 
-module.exports = { protect };
+

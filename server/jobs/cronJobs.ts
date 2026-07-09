@@ -1,7 +1,7 @@
-const cron = require('node-cron');
-const Transaction = require('../models/transaction.model');
+import cron from 'node-cron';
+import Transaction from '../models/transaction.model';
 
-const startCronJobs = () => {
+export const startCronJobs = () => {
     // Run every day at midnight
     cron.schedule('0 0 * * *', async () => {
         console.log('Running recurring transactions check...');
@@ -65,4 +65,4 @@ const startCronJobs = () => {
     });
 };
 
-module.exports = { startCronJobs };
+

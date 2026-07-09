@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const TRANSACTION_TYPES = require("../constants/transactionTypes")
+import mongoose from "mongoose";
+import TRANSACTION_TYPES from "../constants/transactionTypes";
 
 const transactionSchema = new mongoose.Schema({
     user: {
@@ -61,4 +61,4 @@ const transactionSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model("Transaction", transactionSchema)
+export default mongoose.model("Transaction", transactionSchema);

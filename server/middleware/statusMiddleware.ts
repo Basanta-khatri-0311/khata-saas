@@ -1,4 +1,6 @@
-const activeOnly = (req, res, next) => {
+import { Request, Response, NextFunction } from "express";
+
+export const activeOnly = (req: any, res: any, next: NextFunction) => {
     if (req.user && req.user.status === 'active') {
         next();
     } else {
@@ -9,4 +11,4 @@ const activeOnly = (req, res, next) => {
     }
 };
 
-module.exports = { activeOnly };
+

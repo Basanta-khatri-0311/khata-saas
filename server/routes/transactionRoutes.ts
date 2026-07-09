@@ -1,6 +1,6 @@
-const express = require("express");
-const { protect } = require("../middleware/authMiddleware");
-const { 
+import express from "express";
+import { protect } from "../middleware/authMiddleware";
+import { 
     createTransaction, 
     getTransactions, 
     getSummary, 
@@ -9,10 +9,9 @@ const {
     getDayBookSummary,
     verifyTransaction,
     scanReceipt
-} = require("../controllers/transactionController");
-
-const { activeOnly } = require("../middleware/statusMiddleware");
-const multer = require("multer");
+} from "../controllers/transactionController";
+import { activeOnly } from "../middleware/statusMiddleware";
+import multer from "multer";
 
 const transactionRoute = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -26,4 +25,4 @@ transactionRoute.put("/:id", protect, activeOnly, updateTransaction);
 transactionRoute.put("/:id/verify", protect, verifyTransaction);
 transactionRoute.delete("/:id", protect, activeOnly, deleteTransaction);
 
-module.exports = transactionRoute;
+export default transactionRoute;

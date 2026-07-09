@@ -1,7 +1,8 @@
-const Item = require('../models/item.model');
+import Item from "../models/item.model";
+import { Request, Response } from "express";
 
 // Get all items for the user
-const getItems = async (req, res) => {
+export const getItems = async (req: any, res: any) => {
     try {
         const items = await Item.find({ user: req.user.id }).sort({ createdAt: -1 });
         res.status(200).json(items);
@@ -11,7 +12,7 @@ const getItems = async (req, res) => {
 };
 
 // Create a new item
-const createItem = async (req, res) => {
+export const createItem = async (req: any, res: any) => {
     try {
         const { name, sku, description, sellingPrice, costPrice, stockQuantity, lowStockThreshold, unit } = req.body;
 
@@ -38,7 +39,7 @@ const createItem = async (req, res) => {
 };
 
 // Update an item
-const updateItem = async (req, res) => {
+export const updateItem = async (req: any, res: any) => {
     try {
         const item = await Item.findOneAndUpdate(
             { _id: req.params.id, user: req.user.id },
@@ -53,7 +54,7 @@ const updateItem = async (req, res) => {
 };
 
 // Delete an item
-const deleteItem = async (req, res) => {
+export const deleteItem = async (req: any, res: any) => {
     try {
         const item = await Item.findOneAndDelete({ _id: req.params.id, user: req.user.id });
         if (!item) return res.status(404).json({ error: 'Item not found' });
@@ -64,7 +65,7 @@ const deleteItem = async (req, res) => {
 };
 
 // Adjust stock (add or remove units)
-const adjustStock = async (req, res) => {
+export const adjustStock = async (req: any, res: any) => {
     try {
         const { adjustment, reason } = req.body; // adjustment can be positive or negative
         if (adjustment === undefined || adjustment === null || adjustment === '') {
@@ -93,7 +94,7 @@ const adjustStock = async (req, res) => {
 };
 
 // Get inventory summary (low stock alerts etc.)
-const getInventorySummary = async (req, res) => {
+export const getInventorySummary = async (req: any, res: any) => {
     try {
         const items = await Item.find({ user: req.user.id });
         const totalItems = items.length;
@@ -115,4 +116,4 @@ const getInventorySummary = async (req, res) => {
     }
 };
 
-module.exports = { getItems, createItem, updateItem, deleteItem, adjustStock, getInventorySummary };
+

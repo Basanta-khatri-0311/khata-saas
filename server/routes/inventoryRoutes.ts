@@ -1,13 +1,13 @@
-const express = require('express');
-const { protect } = require('../middleware/authMiddleware');
-const {
+import express from 'express';
+import { protect } from '../middleware/authMiddleware';
+import {
     getItems,
     createItem,
     updateItem,
     deleteItem,
     adjustStock,
     getInventorySummary
-} = require('../controllers/inventoryController');
+} from '../controllers/inventoryController';
 
 const inventoryRoute = express.Router();
 
@@ -18,4 +18,4 @@ inventoryRoute.put('/:id', protect, updateItem);
 inventoryRoute.put('/:id/adjust', protect, adjustStock);
 inventoryRoute.delete('/:id', protect, deleteItem);
 
-module.exports = inventoryRoute;
+export default inventoryRoute;

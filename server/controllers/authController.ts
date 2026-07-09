@@ -1,5 +1,6 @@
-const User = require("../models/user.model");
-const jwt = require("jsonwebtoken");
+import User from "../models/user.model";
+import jwt from "jsonwebtoken";
+import { Request, Response } from "express";
 
 const generateToken = (id) => {
     if (!process.env.JWT_SECRET) {
@@ -8,7 +9,7 @@ const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
-const registerUser = async (req, res) => {
+export const registerUser = async (req: any, res: any) => {
     const { name, email, password } = req.body;
     try {
         if (!name || !email || !password) {
@@ -49,11 +50,11 @@ const registerUser = async (req, res) => {
     }
 };
 
-const loginUser = async (req, res) => {
+export const loginUser = async (req: any, res: any) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
-        if (user && (await user.matchPassword(password))) {
+        if (user && (await (user as any).matchPassword(password))) {
             if (user.status === 'suspended') {
                 return res.status(403).json({ message: "Your account has been suspended. Please contact admin." });
             }
@@ -74,8 +75,8 @@ const loginUser = async (req, res) => {
     }
 };
 
-const getMe = async (req, res) => {
+export const getMe = async (req: any, res: any) => {
     res.status(200).json(req.user);
 };
 
-module.exports = { registerUser, loginUser, getMe };
+

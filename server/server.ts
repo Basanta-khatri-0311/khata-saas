@@ -1,14 +1,14 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const connectDB = require("./config/db");
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDB from "./config/db";
 
-const transactionRoute = require("./routes/transactionRoutes");
-const adminRoute = require("./routes/adminRoutes");
-const settingsRoute = require("./routes/settingsRoutes");
-const authRoute = require("./routes/authRoutes");
-const inventoryRoute = require("./routes/inventoryRoutes");
-const { startCronJobs } = require("./jobs/cronJobs");
+import transactionRoute from "./routes/transactionRoutes";
+import adminRoute from "./routes/adminRoutes";
+import settingsRoute from "./routes/settingsRoutes";
+import authRoute from "./routes/authRoutes";
+import inventoryRoute from "./routes/inventoryRoutes";
+import { startCronJobs } from "./jobs/cronJobs";
 
 dotenv.config();
 connectDB();
@@ -36,17 +36,17 @@ app.use("/api/inventory", inventoryRoute);
 
 const PORT = process.env.PORT || 5200;
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("Hello From the Server!");
 });
 
 // Handle 404 for undefined API routes
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({ message: "API Route Not Found" });
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ 
     message: "Server Error", 

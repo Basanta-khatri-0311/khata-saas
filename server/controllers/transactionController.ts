@@ -1,11 +1,13 @@
-const Transaction = require("../models/transaction.model");
-const TRANSACTION_TYPES = require("../constants/transactionTypes");
-const Item = require("../models/item.model");
-const { GoogleGenAI } = require("@google/genai");
+import Transaction from "../models/transaction.model";
+import TRANSACTION_TYPES from "../constants/transactionTypes";
+import Item from "../models/item.model";
+import { GoogleGenAI } from "@google/genai";
+import mongoose from "mongoose";
+import { Request, Response } from "express";
 
 // Initialize Gemini API (will use GEMINI_API_KEY from environment)
 
-const createTransaction = async (req, res) => {
+export const createTransaction = async (req: any, res: any) => {
     try {
         const { amount, type, category, note, createdAt, customerName, customerPhone, recurrence, items } = req.body;
 
@@ -39,7 +41,7 @@ const createTransaction = async (req, res) => {
         }
         // --- End Validation ---
 
-        const transactionData = {
+        const transactionData: any = {
             user: req.user.id,
             amount: parsedAmount,
             type,
@@ -81,7 +83,7 @@ const createTransaction = async (req, res) => {
     }
 }
 
-const getTransactions = async (req, res) => {
+export const getTransactions = async (req: any, res: any) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100; // Increased limit to not break things too much
@@ -105,9 +107,8 @@ const getTransactions = async (req, res) => {
     }
 }
 
-const getSummary = async (req, res) => {
+export const getSummary = async (req: any, res: any) => {
     try {
-        const mongoose = require('mongoose');
         const summary = await Transaction.aggregate([
             { 
                 $match: { 
@@ -173,7 +174,7 @@ const getSummary = async (req, res) => {
     }
 }
 
-const updateTransaction = async (req, res) => {
+export const updateTransaction = async (req: any, res: any) => {
     try {
         const { id } = req.params;
         const { amount, type, category, note, createdAt, customerName, customerPhone, status } = req.body;
@@ -191,7 +192,7 @@ const updateTransaction = async (req, res) => {
         
         console.log(`[UPDATE] ID: ${id}, User: ${req.user?._id}`);
         
-        const updatedData = { 
+        const updatedData: any = { 
             amount: parsedAmount, 
             type, 
             category: category || "General", 
@@ -224,7 +225,7 @@ const updateTransaction = async (req, res) => {
     }
 }
 
-const deleteTransaction = async (req, res) => {
+export const deleteTransaction = async (req: any, res: any) => {
     try {
         const { id } = req.params
         const transaction = await Transaction.findOneAndDelete({ _id: id, user: req.user.id }); 
@@ -240,15 +241,13 @@ const deleteTransaction = async (req, res) => {
     }
 }
 
-const getDayBookSummary = async (req, res) => {
+export const getDayBookSummary = async (req: any, res: any) => {
     try {
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
 
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
-
-        const mongoose = require('mongoose');
         const summary = await Transaction.aggregate([
             { 
                 $match: { 
@@ -295,7 +294,7 @@ const getDayBookSummary = async (req, res) => {
     }
 };
 
-const verifyTransaction = async (req, res) => {
+export const verifyTransaction = async (req: any, res: any) => {
     try {
         const { id } = req.params;
         const transaction = await Transaction.findOneAndUpdate(
@@ -314,7 +313,7 @@ const verifyTransaction = async (req, res) => {
     }
 };
 
-const scanReceipt = async (req, res) => {
+export const scanReceipt = async (req: any, res: any) => {
     try {
         if (!process.env.GEMINI_API_KEY) {
             return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
@@ -324,7 +323,7 @@ const scanReceipt = async (req, res) => {
             return res.status(400).json({ error: "No image provided." });
         }
 
-        const ai = new GoogleGenAI();
+        const ai = new GoogleGenAI({});
         
         // Convert buffer to base64
         const base64Image = req.file.buffer.toString('base64');
@@ -364,15 +363,3 @@ const scanReceipt = async (req, res) => {
         res.status(500).json({ error: "Failed to process the receipt image." });
     }
 };
-
-module.exports = { 
-    createTransaction, 
-    getTransactions, 
-    getSummary,
-    deleteTransaction,
-    updateTransaction,
-    getDayBookSummary,
-    verifyTransaction,
-    scanReceipt
-};
-// Export the createTransaction, getTransaction, and getSummary functions to be used in other parts of the application

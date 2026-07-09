@@ -6,4 +6,4 @@ const TRANSACTION_TYPES = {
 }
 
 
-module.exports = TRANSACTION_TYPES
+export default TRANSACTION_TYPES;

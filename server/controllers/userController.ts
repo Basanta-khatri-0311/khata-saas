@@ -1,6 +1,7 @@
-const User = require("../models/user.model");
+import User from "../models/user.model";
+import { Request, Response } from "express";
 
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req: any, res: any) => {
     try {
         const users = await User.find({}).select("-password").sort({ createdAt: -1 });
         res.status(200).json(users);
@@ -9,7 +10,7 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-const updateUserStatus = async (req, res) => {
+export const updateUserStatus = async (req: any, res: any) => {
     try {
         const { id } = req.params;
         const { status, role } = req.body;
@@ -27,7 +28,7 @@ const updateUserStatus = async (req, res) => {
     }
 };
 
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req: any, res: any) => {
     try {
         const { id } = req.params;
         // Don't let admins delete themselves
@@ -40,4 +41,4 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getAllUsers, updateUserStatus, deleteUser };
+

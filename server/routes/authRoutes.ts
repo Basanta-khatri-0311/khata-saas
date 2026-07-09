@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import { registerUser, loginUser, getMe } from '../controllers/authController';
+import { protect } from '../middleware/authMiddleware';
+import rateLimit from 'express-rate-limit';
+
 const router = express.Router();
-const { registerUser, loginUser, getMe } = require('../controllers/authController');
-const { protect } = require('../middleware/authMiddleware');
-const rateLimit = require('express-rate-limit');
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -14,4 +15,4 @@ router.post('/register', registerUser);
 router.post('/login', loginLimiter, loginUser);
 router.get('/me', protect, getMe);
 
-module.exports = router;
+export default router;

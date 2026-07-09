@@ -1,6 +1,7 @@
-const Settings = require("../models/settings.model");
+import Settings from "../models/settings.model";
+import { Request, Response } from "express";
 
-const getSettings = async (req, res) => {
+export const getSettings = async (req: any, res: any) => {
     try {
         let settings = await Settings.findOne({ user: req.user.id });
         if (!settings) {
@@ -12,7 +13,7 @@ const getSettings = async (req, res) => {
     }
 };
 
-const updateSettings = async (req, res) => {
+export const updateSettings = async (req: any, res: any) => {
     try {
         const { businessName, businessSubtitle, businessPhone, incomeCategories, expenseCategories, language } = req.body;
         let settings = await Settings.findOne({ user: req.user.id });
@@ -34,4 +35,4 @@ const updateSettings = async (req, res) => {
     }
 };
 
-module.exports = { getSettings, updateSettings };
+
