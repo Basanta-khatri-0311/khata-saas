@@ -5,7 +5,9 @@
 
 Khata is a high-performance, responsive financial ledger and multi-tenant SaaS platform tailored specifically for businesses in Nepal. Built with an industrial-modern aesthetic, it provides businesses with precision in tracking income, expenses, and credit (Udharo) while maintaining complete data isolation and seamless bilingual localization (English/Nepali).
 
+
 ---
+
 
 ## 🌟 Core Capabilities
 
